@@ -1,32 +1,32 @@
-'use client'
+﻿'use client'
 import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import DashboardShell from '@/components/layout/DashboardShell'
 
 const NAV = [
-  { href:'/vendor/dashboard',    label:'Dashboard',    icon:'🏠' },
-  { href:'/vendor/bookings',     label:'Bookings',     icon:'📅' },
-  { href:'/vendor/messages',     label:'Messages',     icon:'💬' },
-  { href:'/vendor/quotes',       label:'Quotes',       icon:'📄' },
-  { href:'/vendor/profile',      label:'Profile',      icon:'✏️' },
-  { href:'/vendor/portfolio',    label:'Portfolio',    icon:'🖼️' },
-  { href:'/vendor/packages',     label:'Packages',     icon:'📦' },
-  { href:'/vendor/availability', label:'Availability', icon:'🗓️' },
-  { href:'/vendor/crm',          label:'Client CRM',   icon:'👥' },
-  { href:'/vendor/analytics',    label:'Analytics',    icon:'📊' },
-  { href:'/vendor/pricing',      label:'Pricing',      icon:'💰' },
+  { href:'/vendor/dashboard',    label:'Dashboard',    icon:'ðŸ ' },
+  { href:'/vendor/bookings',     label:'Bookings',     icon:'ðŸ“…' },
+  { href:'/vendor/messages',     label:'Messages',     icon:'ðŸ’¬' },
+  { href:'/vendor/quotes',       label:'Quotes',       icon:'ðŸ“„' },
+  { href:'/vendor/profile',      label:'Profile',      icon:'âœï¸' },
+  { href:'/vendor/portfolio',    label:'Portfolio',    icon:'ðŸ–¼ï¸' },
+  { href:'/vendor/packages',     label:'Packages',     icon:'ðŸ“¦' },
+  { href:'/vendor/availability', label:'Availability', icon:'ðŸ—“ï¸' },
+  { href:'/vendor/crm',          label:'Client CRM',   icon:'ðŸ‘¥' },
+  { href:'/vendor/analytics',    label:'Analytics',    icon:'ðŸ“Š' },
+  { href:'/vendor/pricing',      label:'Pricing',      icon:'ðŸ’°' },
 ]
 
 const CURRENCIES: Record<string,{symbol:string;pro:number;premium:number;flag:string}> = {
-  NGN: { symbol:'₦',   pro:8000,  premium:20000, flag:'🇳🇬' },
-  GBP: { symbol:'£',   pro:8,     premium:20,    flag:'🇬🇧' },
-  USD: { symbol:'$',   pro:10,    premium:25,    flag:'🇺🇸' },
-  EUR: { symbol:'€',   pro:9,     premium:22,    flag:'🇪🇺' },
-  CAD: { symbol:'CA$', pro:13,    premium:33,    flag:'🇨🇦' },
-  AUD: { symbol:'A$',  pro:15,    premium:38,    flag:'🇦🇺' },
-  GHS: { symbol:'GH₵', pro:100,   premium:250,   flag:'🇬🇭' },
-  KES: { symbol:'KSh', pro:1300,  premium:3300,  flag:'🇰🇪' },
-  ZAR: { symbol:'R',   pro:180,   premium:460,   flag:'🇿🇦' },
+  NGN: { symbol:'â‚¦',   pro:8000,  premium:20000, flag:'ðŸ‡³ðŸ‡¬' },
+  GBP: { symbol:'Â£',   pro:8,     premium:20,    flag:'ðŸ‡¬ðŸ‡§' },
+  USD: { symbol:'$',   pro:10,    premium:25,    flag:'ðŸ‡ºðŸ‡¸' },
+  EUR: { symbol:'â‚¬',   pro:9,     premium:22,    flag:'ðŸ‡ªðŸ‡º' },
+  CAD: { symbol:'CA$', pro:13,    premium:33,    flag:'ðŸ‡¨ðŸ‡¦' },
+  AUD: { symbol:'A$',  pro:15,    premium:38,    flag:'ðŸ‡¦ðŸ‡º' },
+  GHS: { symbol:'GHâ‚µ', pro:100,   premium:250,   flag:'ðŸ‡¬ðŸ‡­' },
+  KES: { symbol:'KSh', pro:1300,  premium:3300,  flag:'ðŸ‡°ðŸ‡ª' },
+  ZAR: { symbol:'R',   pro:180,   premium:460,   flag:'ðŸ‡¿ðŸ‡¦' },
 }
 
 function fmt(amount: number, symbol: string) {
@@ -57,7 +57,7 @@ function PricingInner() {
         { text:'In-app messaging',         ok:true  },
         { text:'Featured in search',       ok:false },
         { text:'Profile analytics',        ok:false },
-        { text:'✓ Verified badge',         ok:false },
+        { text:'âœ“ Verified badge',         ok:false },
         { text:'Priority support',         ok:false },
       ],
     },
@@ -71,9 +71,9 @@ function PricingInner() {
         { text:'Worldwide listing',        ok:true },
         { text:'Receive booking requests', ok:true },
         { text:'In-app messaging',         ok:true },
-        { text:'⭐ Featured in search',    ok:true },
+        { text:'â­ Featured in search',    ok:true },
         { text:'Profile analytics',        ok:true },
-        { text:'✓ Verified badge',         ok:false },
+        { text:'âœ“ Verified badge',         ok:false },
         { text:'Priority support',         ok:false },
       ],
     },
@@ -86,9 +86,9 @@ function PricingInner() {
         { text:'Diaspora listing boost',   ok:true },
         { text:'Priority booking queue',   ok:true },
         { text:'In-app messaging',         ok:true },
-        { text:'🔥 Top of search results', ok:true },
+        { text:'ðŸ”¥ Top of search results', ok:true },
         { text:'Advanced analytics',       ok:true },
-        { text:'✓ Verified badge',         ok:true },
+        { text:'âœ“ Verified badge',         ok:true },
         { text:'Priority support',         ok:true },
       ],
     },
@@ -129,12 +129,11 @@ function PricingInner() {
               style={{
                 background: `linear-gradient(135deg, var(--bg-card), var(--bg-subtle))`,
                 border: `1px solid ${plan.accent}40`,
-                ringColor: plan.accent,
-              }}>
+                }}>
               {plan.popular && (
                 <div className="absolute top-0 left-0 right-0 py-1.5 text-center text-xs font-bold"
                   style={{background:'#C8A96E', color:'#fff'}}>
-                  ⭐ MOST POPULAR
+                  â­ MOST POPULAR
                 </div>
               )}
               <div className={`p-6 ${plan.popular ? 'pt-10' : ''}`}>
@@ -153,7 +152,7 @@ function PricingInner() {
                   {plan.features.map(f => (
                     <li key={f.text} className="flex items-center gap-2.5 text-sm">
                       <span className={`text-base flex-shrink-0 ${f.ok ? '' : 'opacity-25'}`}>
-                        {f.ok ? '✓' : '✗'}
+                        {f.ok ? 'âœ“' : 'âœ—'}
                       </span>
                       <span style={{color: f.ok ? 'var(--text)' : 'var(--text-faint)'}}>{f.text}</span>
                     </li>
@@ -168,7 +167,7 @@ function PricingInner() {
                     color: current===plan.id ? '#fff' : plan.accent,
                     border: `1px solid ${plan.accent}40`,
                   }}>
-                  {current === plan.id ? '✓ Current Plan' : plan.id==='free' ? 'Downgrade to Free' : `Upgrade to ${plan.name}`}
+                  {current === plan.id ? 'âœ“ Current Plan' : plan.id==='free' ? 'Downgrade to Free' : `Upgrade to ${plan.name}`}
                 </button>
               </div>
             </div>
@@ -176,7 +175,7 @@ function PricingInner() {
         </div>
 
         <p className="text-xs text-center mt-6" style={{color:'var(--text-faint)'}}>
-          Nigerian vendors pay via Paystack · International vendors via Stripe · Cancel anytime
+          Nigerian vendors pay via Paystack Â· International vendors via Stripe Â· Cancel anytime
         </p>
       </div>
     </DashboardShell>
