@@ -4,7 +4,7 @@ import { stripe } from '@/lib/stripe'
 import { sendVendorUpgraded } from '@/lib/email'
 import Stripe from 'stripe'
 
-export const runtime = 'nodejs' }
+export const runtime = 'nodejs'
 
 export async function POST(req: NextRequest) {
   if (!process.env.STRIPE_WEBHOOK_SECRET || process.env.STRIPE_WEBHOOK_SECRET.includes('xxx')) {
@@ -88,4 +88,5 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ received: true })
 }
+
 
