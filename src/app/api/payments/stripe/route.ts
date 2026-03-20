@@ -9,19 +9,23 @@ export async function POST(req: NextRequest) {
   const auth = await requireRole(req, ['VENDOR', 'SUPER_ADMIN'])
   if ('error' in auth) return auth.error
 
-
   const { plan } = await req.json()
   if (!['pro', 'premium'].includes(plan)) {
     return NextResponse.json({ error: 'Invalid plan' }, { status: 400 })
+  }
 
   const user = await prisma.user.findUnique({
-    where: { id: auth.userId },
+    where:  { id: auth.userId },
     select: { name: true, email: true, country: true },
   })
   if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 })
 
   const vendor = await prisma.vendor.findUnique({ where: { userId: auth.userId } })
   if (!vendor) return NextResponse.json({ error: 'No vendor profile' }, { status: 404 })
+
+  if (!process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY.includes('xxx')) {
+    return NextResponse.json({ error: 'Stripe is not configured' }, { status: 503 })
+  }
 
   const currency = getCurrencyForCountry(vendor.country ?? user.country ?? 'US')
 
@@ -37,5 +41,3 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ checkoutUrl: session.url, sessionId: session.id })
 }
-
-
