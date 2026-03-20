@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+﻿import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { requireRole } from '@/lib/auth'
 import { createStripeCheckout, getCurrencyForCountry } from '@/lib/stripe'
@@ -9,8 +9,7 @@ export async function POST(req: NextRequest) {
   const auth = await requireRole(req, ['VENDOR', 'SUPER_ADMIN'])
   if ('error' in auth) return auth.error
 
-  if (!stripe) {
-    return NextResponse.json({ error: 'Stripe is not configured. Add STRIPE_SECRET_KEY to .env.local' }, { status: 503 })
+, { status: 503 })
   }
 
   const { plan } = await req.json()
@@ -41,3 +40,4 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ checkoutUrl: session.url, sessionId: session.id })
 }
+
