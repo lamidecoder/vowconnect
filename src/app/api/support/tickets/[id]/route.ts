@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server'
+﻿import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { requireRole, logAdminAction } from '@/lib/auth'
-import { sanitize } from '@/lib/validate'
+import { sanitise as sanitize } from '@/lib/validate'
 
-// PATCH /api/support/tickets/[id] — update ticket (admin) or add reply
+// PATCH /api/support/tickets/[id] â€” update ticket (admin) or add reply
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   try {
     const auth = await requireRole(req, ['CLIENT', 'VENDOR', 'SUPER_ADMIN'])
@@ -63,7 +63,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   }
 }
 
-// DELETE /api/support/tickets/[id] — admin only
+// DELETE /api/support/tickets/[id] â€” admin only
 export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
   try {
     const auth = await requireRole(req, ['SUPER_ADMIN'])
@@ -74,3 +74,4 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
     return NextResponse.json({ error: err.message }, { status: 500 })
   }
 }
+
