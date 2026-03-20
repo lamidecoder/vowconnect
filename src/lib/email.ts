@@ -1,4 +1,4 @@
-// src/lib/email.ts — VowConnect production email templates
+﻿// src/lib/email.ts â€” VowConnect production email templates
 // Provider: Resend (resend.com)
 
 import { Resend } from 'resend'
@@ -10,7 +10,7 @@ const APP        = process.env.NEXT_PUBLIC_APP_URL ?? 'https://vowconnect.com'
 // When Resend isn't configured, log emails to console (dev-friendly fallback)
 async function sendEmail(opts: { from: string; to: string; subject: string; html: string }) {
   if (!resend) {
-    console.log('\n📧 [EMAIL - not sent, RESEND_API_KEY not configured]')
+    console.log('\nðŸ“§ [EMAIL - not sent, RESEND_API_KEY not configured]')
     console.log('  To:', opts.to)
     console.log('  Subject:', opts.subject)
     console.log('  (Set RESEND_API_KEY in .env.local to send real emails)\n')
@@ -23,7 +23,7 @@ function getFrom() {
   return process.env.RESEND_FROM_EMAIL ?? 'VowConnect <hello@vowconnect.com>'
 }
 
-/* ── Design tokens ── */
+/* â”€â”€ Design tokens â”€â”€ */
 const C = {
   gold:       '#C9941A',
   goldLight:  '#E4B520',
@@ -45,7 +45,7 @@ const C = {
   wa:         '#25D366',
 }
 
-/* ── Base layout ── */
+/* â”€â”€ Base layout â”€â”€ */
 function base(body: string, preview = '') {
   return `<!DOCTYPE html>
 <html lang="en">
@@ -84,14 +84,14 @@ function base(body: string, preview = '') {
 <tr><td style="padding:24px 8px 0;text-align:center;">
   <p style="margin:0 0 8px;font-size:12px;color:${C.muted};">
     <a href="${APP}" style="color:${C.gold};text-decoration:none;font-weight:600;">VowConnect</a>
-    &nbsp;·&nbsp;The Global African Wedding Marketplace
+    &nbsp;Â·&nbsp;The Global African Wedding Marketplace
   </p>
   <p style="margin:0;font-size:11px;color:${C.faint};">
     <a href="${APP}/unsubscribe" style="color:${C.faint};text-decoration:none;">Unsubscribe</a>
-    &nbsp;·&nbsp;
+    &nbsp;Â·&nbsp;
     <a href="${APP}/privacy" style="color:${C.faint};text-decoration:none;">Privacy Policy</a>
-    &nbsp;·&nbsp;
-    © ${new Date().getFullYear()} VowConnect
+    &nbsp;Â·&nbsp;
+    Â© ${new Date().getFullYear()} VowConnect
   </p>
 </td></tr>
 
@@ -101,7 +101,7 @@ function base(body: string, preview = '') {
 </body></html>`
 }
 
-/* ── Hero section ── */
+/* â”€â”€ Hero section â”€â”€ */
 function hero(emoji: string, title: string, subtitle: string, gradient = `135deg,${C.umber} 0%,#2C1204 60%,#4A1A08 100%`) {
   return `
 <div class="hero" style="background:linear-gradient(${gradient});padding:40px 40px 36px;text-align:center;">
@@ -112,12 +112,12 @@ function hero(emoji: string, title: string, subtitle: string, gradient = `135deg
 <div style="height:4px;background:linear-gradient(90deg,${C.gold},${C.goldLight},${C.gold});"></div>`
 }
 
-/* ── Body wrapper ── */
+/* â”€â”€ Body wrapper â”€â”€ */
 function body(content: string) {
   return `<div style="padding:36px 40px;">${content}</div>`
 }
 
-/* ── Components ── */
+/* â”€â”€ Components â”€â”€ */
 const h2 = (t: string) => `<h2 style="margin:0 0 8px;font-size:20px;font-weight:700;color:${C.umber};font-family:Georgia,serif;">${t}</h2>`
 const p  = (t: string, style = '') => `<p style="margin:12px 0;font-size:15px;color:${C.text};line-height:1.7;${style}">${t}</p>`
 const hr = () => `<hr style="border:none;border-top:1px solid ${C.border};margin:28px 0;"/>`
@@ -161,7 +161,7 @@ function alert(text: string, type: 'gold'|'green'|'red'|'blue' = 'gold') {
 
 function checklist(items: string[]) {
   return `<ul style="list-style:none;padding:0;margin:16px 0;">
-    ${items.map(i => `<li style="padding:5px 0;font-size:14px;color:${C.text};line-height:1.5;"><span style="color:${C.green};margin-right:8px;font-weight:700;">✓</span>${i}</li>`).join('')}
+    ${items.map(i => `<li style="padding:5px 0;font-size:14px;color:${C.text};line-height:1.5;"><span style="color:${C.green};margin-right:8px;font-weight:700;">âœ“</span>${i}</li>`).join('')}
   </ul>`
 }
 
@@ -176,66 +176,66 @@ function statRow(stats: { label: string; value: string }[]) {
 </div>`
 }
 
-/* ═══════════════════════════════════════════════
-   01 · WELCOME — CLIENT
-═══════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   01 Â· WELCOME â€” CLIENT
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 export async function sendWelcomeClient(p1: { email: string; name: string }) {
   const first = p1.name.split(' ')[0]
   const content = body(`
-    ${h2(`Welcome to VowConnect, ${first}! 🎀`)}
-    ${p('You\'re now part of a global community connecting couples with the finest African wedding vendors — from Lagos to London, Toronto to Accra.')}
+    ${h2(`Welcome to VowConnect, ${first}! ðŸŽ€`)}
+    ${p('You\'re now part of a global community connecting couples with the finest African wedding vendors â€” from Lagos to London, Toronto to Accra.')}
     ${checklist([
       'Browse <strong>500+ verified vendors</strong> across 6 countries',
       'Filter by category, city and budget to find your perfect match',
       'Book directly and manage everything in one place',
       'Chat instantly on WhatsApp with any vendor',
     ])}
-    ${btn('Browse Vendors Now →', `${APP}/vendors`, 'gold')}
+    ${btn('Browse Vendors Now â†’', `${APP}/vendors`, 'gold')}
     ${hr()}
     ${p(`Questions? Reply to this email or <a href="${APP}/contact" style="color:${C.gold};">contact us here</a>.`, `color:${C.muted};font-size:13px;`)}
   `)
   return sendEmail({
     from: getFrom(), to: p1.email,
-    subject: `Welcome to VowConnect, ${first}! 🎀`,
-    html: base(hero('🎀', `Welcome, ${first}!`, 'Your journey to a perfect Nigerian wedding starts here') + content, 'Your dream wedding vendors are waiting'),
+    subject: `Welcome to VowConnect, ${first}! ðŸŽ€`,
+    html: base(hero('ðŸŽ€', `Welcome, ${first}!`, 'Your journey to a perfect Nigerian wedding starts here') + content, 'Your dream wedding vendors are waiting'),
   })
 }
 
-/* ═══════════════════════════════════════════════
-   02 · WELCOME — VENDOR
-═══════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   02 Â· WELCOME â€” VENDOR
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 export async function sendWelcomeVendor(p1: { email: string; name: string; businessName: string }) {
   const first = p1.name.split(' ')[0]
   const content = body(`
     ${h2(`You're on VowConnect, ${first}!`)}
-    ${p(`<strong>${p1.businessName}</strong> has been submitted for review. Our team approves listings within <strong>24 hours</strong> — you'll get an email the moment you're live.`)}
+    ${p(`<strong>${p1.businessName}</strong> has been submitted for review. Our team approves listings within <strong>24 hours</strong> â€” you'll get an email the moment you're live.`)}
     ${hr()}
     <p style="font-size:14px;font-weight:700;color:${C.umber};margin:0 0 8px;">Make your profile irresistible while you wait:</p>
     ${checklist([
-      'Upload <strong>5 high-quality portfolio photos or videos</strong> — the #1 thing clients look at',
+      'Upload <strong>5 high-quality portfolio photos or videos</strong> â€” the #1 thing clients look at',
       'Write a compelling bio: your style, experience & specialties',
-      'Set an accurate price range — clients filter by budget',
-      'Confirm your WhatsApp number — bookings happen there',
+      'Set an accurate price range â€” clients filter by budget',
+      'Confirm your WhatsApp number â€” bookings happen there',
     ])}
-    ${btn('Complete Your Profile →', `${APP}/vendor/profile`, 'gold')}
+    ${btn('Complete Your Profile â†’', `${APP}/vendor/profile`, 'gold')}
     ${statRow([{ value: '500+', label: 'Active vendors' }, { value: '2,400+', label: 'Monthly bookings' }, { value: '6', label: 'Countries' }])}
   `)
   return sendEmail({
     from: getFrom(), to: p1.email,
-    subject: `${p1.businessName} submitted — you'll be live within 24 hours`,
-    html: base(hero('🚀', 'Profile Under Review', 'We\'ll have you live within 24 hours') + content, 'Your VowConnect vendor profile is under review'),
+    subject: `${p1.businessName} submitted â€” you'll be live within 24 hours`,
+    html: base(hero('ðŸš€', 'Profile Under Review', 'We\'ll have you live within 24 hours') + content, 'Your VowConnect vendor profile is under review'),
   })
 }
 
-/* ═══════════════════════════════════════════════
-   03 · VENDOR APPROVED
-═══════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   03 Â· VENDOR APPROVED
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 export async function sendVendorApproved(p1: { vendorEmail: string; vendorName: string; businessName: string }) {
   const first = p1.vendorName.split(' ')[0]
   const content = body(`
     ${h2(`Congratulations, ${first}!`)}
     ${p(`<strong>${p1.businessName}</strong> is now <strong>live on VowConnect</strong> and discoverable by brides and grooms across Nigeria, UK, USA, Canada and Ghana.`)}
-    ${alert('✓ Your profile is approved and accepting bookings', 'green')}
+    ${alert('âœ“ Your profile is approved and accepting bookings', 'green')}
     <p style="font-size:14px;font-weight:700;color:${C.umber};margin:16px 0 8px;">Your first booking checklist:</p>
     ${checklist([
       'Share your VowConnect profile link on Instagram and WhatsApp',
@@ -243,19 +243,19 @@ export async function sendVendorApproved(p1: { vendorEmail: string; vendorName: 
       'Block out dates you\'re not available in your calendar',
       'Respond to booking requests within 2 hours for best rankings',
     ])}
-    ${btn('Go to My Dashboard →', `${APP}/vendor/dashboard`, 'gold')}
-    ${btn('View My Public Profile →', `${APP}/vendors`, 'outline')}
+    ${btn('Go to My Dashboard â†’', `${APP}/vendor/dashboard`, 'gold')}
+    ${btn('View My Public Profile â†’', `${APP}/vendors`, 'outline')}
   `)
   return sendEmail({
     from: getFrom(), to: p1.vendorEmail,
-    subject: `🎉 ${p1.businessName} is now LIVE on VowConnect!`,
-    html: base(hero('🎉', 'You\'re Live!', `${p1.businessName} is now accepting bookings`, `135deg,${C.green} 0%,#0D6B30 100%`) + content, 'Your profile is live — clients can find you now'),
+    subject: `ðŸŽ‰ ${p1.businessName} is now LIVE on VowConnect!`,
+    html: base(hero('ðŸŽ‰', 'You\'re Live!', `${p1.businessName} is now accepting bookings`, `135deg,${C.green} 0%,#0D6B30 100%`) + content, 'Your profile is live â€” clients can find you now'),
   })
 }
 
-/* ═══════════════════════════════════════════════
-   04 · VENDOR REJECTED
-═══════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   04 Â· VENDOR REJECTED
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 export async function sendVendorRejected(p1: { vendorEmail: string; vendorName: string; businessName: string; reason?: string }) {
   const first = p1.vendorName.split(' ')[0]
   const content = body(`
@@ -270,19 +270,19 @@ export async function sendVendorRejected(p1: { vendorEmail: string; vendorName: 
       'Invalid or missing WhatsApp number',
       'Category doesn\'t match the service offered',
     ])}
-    ${p('Fix the issues above and resubmit — we\'d love to have you on the platform.')}
-    ${btn('Update My Profile →', `${APP}/vendor/profile`, 'dark')}
+    ${p('Fix the issues above and resubmit â€” we\'d love to have you on the platform.')}
+    ${btn('Update My Profile â†’', `${APP}/vendor/profile`, 'dark')}
   `)
   return sendEmail({
     from: getFrom(), to: p1.vendorEmail,
-    subject: `${p1.businessName} — Profile Review Update`,
-    html: base(hero('📋', 'Profile Review Update', 'Action needed before your listing goes live') + content),
+    subject: `${p1.businessName} â€” Profile Review Update`,
+    html: base(hero('ðŸ“‹', 'Profile Review Update', 'Action needed before your listing goes live') + content),
   })
 }
 
-/* ═══════════════════════════════════════════════
-   05 · BOOKING REQUEST → VENDOR
-═══════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   05 Â· BOOKING REQUEST â†’ VENDOR
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 export async function sendBookingRequestToVendor(p1: {
   vendorEmail: string; vendorName: string; businessName: string
   clientName: string; clientPhone?: string
@@ -295,30 +295,30 @@ export async function sendBookingRequestToVendor(p1: {
     ${h2(`New booking request from ${p1.clientName}`)}
     ${p(`Hi <strong>${p1.vendorName.split(' ')[0]}</strong>, someone wants to book <strong>${p1.businessName}</strong>!`)}
     ${infoCard([
-      { icon: '👰', label: 'Client',     value: p1.clientName },
-      { icon: '📅', label: 'Event Date', value: p1.eventDate },
-      { icon: '🎊', label: 'Event Type', value: p1.eventType },
-      ...(p1.location ? [{ icon: '📍', label: 'Location', value: p1.location }] : []),
+      { icon: 'ðŸ‘°', label: 'Client',     value: p1.clientName },
+      { icon: 'ðŸ“…', label: 'Event Date', value: p1.eventDate },
+      { icon: 'ðŸŽŠ', label: 'Event Type', value: p1.eventType },
+      ...(p1.location ? [{ icon: 'ðŸ“', label: 'Location', value: p1.location }] : []),
     ], 'Booking Details')}
     ${p1.notes ? `
       <div style="background:${C.cream};border:1px solid ${C.border};border-radius:12px;padding:16px 20px;margin:16px 0;">
         <div style="font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:${C.muted};margin-bottom:6px;">Message from client</div>
         <p style="margin:0;font-size:14px;color:${C.text};line-height:1.6;font-style:italic;">"${p1.notes}"</p>
       </div>` : ''}
-    ${alert('⏰ <strong>Respond within 2 hours</strong> for best rankings. Vendors who respond fast get 3× more bookings.', 'gold')}
-    ${btn('Accept or Decline →', `${APP}/vendor/bookings`, 'gold')}
-    ${waLink ? btn('💬 Message Client on WhatsApp', waLink, 'green') : ''}
+    ${alert('â° <strong>Respond within 2 hours</strong> for best rankings. Vendors who respond fast get 3Ã— more bookings.', 'gold')}
+    ${btn('Accept or Decline â†’', `${APP}/vendor/bookings`, 'gold')}
+    ${waLink ? btn('ðŸ’¬ Message Client on WhatsApp', waLink, 'green') : ''}
   `)
   return sendEmail({
     from: getFrom(), to: p1.vendorEmail,
-    subject: `📅 New booking request — ${p1.eventType} on ${p1.eventDate}`,
-    html: base(hero('📅', 'New Booking Request', `${p1.clientName} wants to book ${p1.businessName}`, `135deg,${C.gold} 0%,#8B6A0A 100%`) + content, `${p1.clientName} wants to book your services`),
+    subject: `ðŸ“… New booking request â€” ${p1.eventType} on ${p1.eventDate}`,
+    html: base(hero('ðŸ“…', 'New Booking Request', `${p1.clientName} wants to book ${p1.businessName}`, `135deg,${C.gold} 0%,#8B6A0A 100%`) + content, `${p1.clientName} wants to book your services`),
   })
 }
 
-/* ═══════════════════════════════════════════════
-   06 · BOOKING CONFIRMATION → CLIENT
-═══════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   06 Â· BOOKING CONFIRMATION â†’ CLIENT
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 export async function sendBookingConfirmationToClient(p1: {
   clientEmail: string; clientName: string; businessName: string; vendorWhatsapp?: string
   eventType: string; eventDate: string; bookingId: string
@@ -331,25 +331,25 @@ export async function sendBookingConfirmationToClient(p1: {
     ${h2(`Your request is sent, ${first}!`)}
     ${p(`Your booking request for <strong>${p1.businessName}</strong> has been received. They typically respond within a few hours.`)}
     ${infoCard([
-      { icon: '🏪', label: 'Vendor',     value: p1.businessName },
-      { icon: '🎊', label: 'Event Type', value: p1.eventType },
-      { icon: '📅', label: 'Event Date', value: p1.eventDate },
-      { icon: '🔖', label: 'Booking ID', value: `#${p1.bookingId.slice(0, 8).toUpperCase()}` },
+      { icon: 'ðŸª', label: 'Vendor',     value: p1.businessName },
+      { icon: 'ðŸŽŠ', label: 'Event Type', value: p1.eventType },
+      { icon: 'ðŸ“…', label: 'Event Date', value: p1.eventDate },
+      { icon: 'ðŸ”–', label: 'Booking ID', value: `#${p1.bookingId.slice(0, 8).toUpperCase()}` },
     ], 'Booking Summary')}
-    ${alert('💡 <strong>Tip:</strong> You can message the vendor on WhatsApp while you wait for a response.', 'gold')}
-    ${btn('View My Bookings →', `${APP}/client/bookings`, 'gold')}
-    ${waLink ? btn('💬 Chat with Vendor on WhatsApp', waLink, 'green') : ''}
+    ${alert('ðŸ’¡ <strong>Tip:</strong> You can message the vendor on WhatsApp while you wait for a response.', 'gold')}
+    ${btn('View My Bookings â†’', `${APP}/client/bookings`, 'gold')}
+    ${waLink ? btn('ðŸ’¬ Chat with Vendor on WhatsApp', waLink, 'green') : ''}
   `)
   return sendEmail({
     from: getFrom(), to: p1.clientEmail,
-    subject: `✅ Booking request sent to ${p1.businessName}`,
-    html: base(hero('✅', 'Booking Request Sent!', `${p1.businessName} has been notified`, `135deg,${C.green} 0%,#0D6B30 100%`) + content, 'Your booking request has been received'),
+    subject: `âœ… Booking request sent to ${p1.businessName}`,
+    html: base(hero('âœ…', 'Booking Request Sent!', `${p1.businessName} has been notified`, `135deg,${C.green} 0%,#0D6B30 100%`) + content, 'Your booking request has been received'),
   })
 }
 
-/* ═══════════════════════════════════════════════
-   07 · BOOKING ACCEPTED → CLIENT
-═══════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   07 Â· BOOKING ACCEPTED â†’ CLIENT
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 export async function sendBookingAcceptedToClient(p1: {
   clientEmail: string; clientName: string; businessName: string; vendorWhatsapp?: string
   eventType: string; eventDate: string; bookingId: string; vendorNote?: string
@@ -359,32 +359,32 @@ export async function sendBookingAcceptedToClient(p1: {
     ? `https://wa.me/${p1.vendorWhatsapp.replace(/\D/g,'').replace(/^0/,'234')}`
     : null
   const content = body(`
-    ${h2(`${first}, your booking is confirmed! 🎉`)}
+    ${h2(`${first}, your booking is confirmed! ðŸŽ‰`)}
     ${p(`<strong>${p1.businessName}</strong> has accepted your booking request. Get in touch to discuss the details and make it official.`)}
     ${infoCard([
-      { icon: '🏪', label: 'Vendor',     value: p1.businessName },
-      { icon: '🎊', label: 'Event',      value: p1.eventType },
-      { icon: '📅', label: 'Date',       value: p1.eventDate },
+      { icon: 'ðŸª', label: 'Vendor',     value: p1.businessName },
+      { icon: 'ðŸŽŠ', label: 'Event',      value: p1.eventType },
+      { icon: 'ðŸ“…', label: 'Date',       value: p1.eventDate },
     ])}
     ${p1.vendorNote ? `
       <div style="background:${C.cream};border-left:3px solid ${C.gold};border-radius:0 12px 12px 0;padding:14px 18px;margin:16px 0;">
         <div style="font-size:11px;font-weight:700;letter-spacing:0.5px;color:${C.muted};margin-bottom:4px;">Message from vendor</div>
         <p style="margin:0;font-size:14px;color:${C.text};line-height:1.6;font-style:italic;">"${p1.vendorNote}"</p>
       </div>` : ''}
-    ${alert('🎊 <strong>Next step:</strong> Message the vendor on WhatsApp to discuss payment, timing and specific requirements.', 'green')}
-    ${btn('View Booking Details →', `${APP}/client/bookings/${p1.bookingId}`, 'gold')}
-    ${waLink ? btn('💬 Message Vendor on WhatsApp', waLink, 'green') : ''}
+    ${alert('ðŸŽŠ <strong>Next step:</strong> Message the vendor on WhatsApp to discuss payment, timing and specific requirements.', 'green')}
+    ${btn('View Booking Details â†’', `${APP}/client/bookings/${p1.bookingId}`, 'gold')}
+    ${waLink ? btn('ðŸ’¬ Message Vendor on WhatsApp', waLink, 'green') : ''}
   `)
   return sendEmail({
     from: getFrom(), to: p1.clientEmail,
-    subject: `🎉 ${p1.businessName} accepted your booking!`,
-    html: base(hero('🎉', 'Booking Accepted!', `${p1.businessName} is ready for your ${p1.eventType}`, `135deg,${C.green} 0%,#0D6B30 100%`) + content, `Great news — ${p1.businessName} said yes!`),
+    subject: `ðŸŽ‰ ${p1.businessName} accepted your booking!`,
+    html: base(hero('ðŸŽ‰', 'Booking Accepted!', `${p1.businessName} is ready for your ${p1.eventType}`, `135deg,${C.green} 0%,#0D6B30 100%`) + content, `Great news â€” ${p1.businessName} said yes!`),
   })
 }
 
-/* ═══════════════════════════════════════════════
-   08 · BOOKING DECLINED → CLIENT
-═══════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   08 Â· BOOKING DECLINED â†’ CLIENT
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 export async function sendBookingDeclinedToClient(p1: {
   clientEmail: string; clientName: string; businessName: string
   eventType: string; eventDate: string; reason?: string
@@ -394,20 +394,20 @@ export async function sendBookingDeclinedToClient(p1: {
     ${h2(`Update on your booking, ${first}`)}
     ${p(`Unfortunately, <strong>${p1.businessName}</strong> is unable to take your booking for <strong>${p1.eventDate}</strong>.`)}
     ${p1.reason ? alert(`<strong>Reason:</strong> ${p1.reason}`, 'red') : ''}
-    ${p('Don\'t worry — there are hundreds of other great vendors on VowConnect!')}
-    ${btn('Find Another Vendor →', `${APP}/vendors`, 'gold')}
-    ${p(`Need help finding the right vendor? <a href="${APP}/contact" style="color:${C.gold};">Contact our team</a> — we\'re happy to assist.`, `color:${C.muted};font-size:13px;`)}
+    ${p('Don\'t worry â€” there are hundreds of other great vendors on VowConnect!')}
+    ${btn('Find Another Vendor â†’', `${APP}/vendors`, 'gold')}
+    ${p(`Need help finding the right vendor? <a href="${APP}/contact" style="color:${C.gold};">Contact our team</a> â€” we\'re happy to assist.`, `color:${C.muted};font-size:13px;`)}
   `)
   return sendEmail({
     from: getFrom(), to: p1.clientEmail,
     subject: `Update on your ${p1.businessName} booking`,
-    html: base(hero('📋', 'Booking Update', 'We\'ll help you find the perfect alternative') + content),
+    html: base(hero('ðŸ“‹', 'Booking Update', 'We\'ll help you find the perfect alternative') + content),
   })
 }
 
-/* ═══════════════════════════════════════════════
-   09 · BOOKING COMPLETED + REVIEW REQUEST → CLIENT
-═══════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   09 Â· BOOKING COMPLETED + REVIEW REQUEST â†’ CLIENT
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 export async function sendReviewRequest(p1: {
   clientEmail: string; clientName: string; businessName: string
   eventType: string; eventDate: string; bookingId: string
@@ -415,47 +415,47 @@ export async function sendReviewRequest(p1: {
   const first = p1.clientName.split(' ')[0]
   const content = body(`
     ${h2(`How did ${p1.businessName} do?`)}
-    ${p(`Hi <strong>${first}</strong>, your <strong>${p1.eventType}</strong> was on <strong>${p1.eventDate}</strong> — we hope it was absolutely magical! 💫`)}
+    ${p(`Hi <strong>${first}</strong>, your <strong>${p1.eventType}</strong> was on <strong>${p1.eventDate}</strong> â€” we hope it was absolutely magical! ðŸ’«`)}
     ${p(`Your honest review of <strong>${p1.businessName}</strong> helps other couples find great vendors and helps good vendors grow. It takes less than 60 seconds.`)}
-    ${btn('Leave a Review ⭐ →', `${APP}/client/bookings/${p1.bookingId}`, 'gold')}
-    ${alert('💛 <strong>Reviews matter.</strong> Every genuine review helps a small business get their next booking.', 'gold')}
+    ${btn('Leave a Review â­ â†’', `${APP}/client/bookings/${p1.bookingId}`, 'gold')}
+    ${alert('ðŸ’› <strong>Reviews matter.</strong> Every genuine review helps a small business get their next booking.', 'gold')}
   `)
   return sendEmail({
     from: getFrom(), to: p1.clientEmail,
-    subject: `How was ${p1.businessName}? Leave a review 🌟`,
-    html: base(hero('⭐', 'Share Your Experience', 'Help other couples find amazing vendors') + content, 'Leave a review for your recent vendor'),
+    subject: `How was ${p1.businessName}? Leave a review ðŸŒŸ`,
+    html: base(hero('â­', 'Share Your Experience', 'Help other couples find amazing vendors') + content, 'Leave a review for your recent vendor'),
   })
 }
 
-/* ═══════════════════════════════════════════════
-   10 · NEW REVIEW → VENDOR
-═══════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   10 Â· NEW REVIEW â†’ VENDOR
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 export async function sendNewReviewToVendor(p1: {
   vendorEmail: string; vendorName: string; businessName: string
   clientName: string; rating: number; comment?: string
 }) {
-  const stars = '★'.repeat(p1.rating) + '☆'.repeat(5 - p1.rating)
+  const stars = 'â˜…'.repeat(p1.rating) + 'â˜†'.repeat(5 - p1.rating)
   const content = body(`
     ${h2(`New ${p1.rating}-star review for ${p1.businessName}`)}
     ${p(`Hi <strong>${p1.vendorName.split(' ')[0]}</strong>, <strong>${p1.clientName}</strong> just left you a review!`)}
     <div style="background:${C.cream};border:1px solid ${C.border};border-radius:16px;padding:24px;margin:20px 0;text-align:center;">
       <div style="font-size:32px;color:${C.gold};letter-spacing:4px;margin-bottom:8px;">${stars}</div>
       <div style="font-size:22px;font-weight:800;color:${C.umber};font-family:Georgia,serif;">${p1.rating}.0 / 5.0</div>
-      ${p1.comment ? `<p style="margin:16px 0 0;font-size:15px;color:${C.text};line-height:1.7;font-style:italic;">"${p1.comment}"</p><p style="margin:8px 0 0;font-size:13px;color:${C.muted};font-weight:600;">— ${p1.clientName}</p>` : ''}
+      ${p1.comment ? `<p style="margin:16px 0 0;font-size:15px;color:${C.text};line-height:1.7;font-style:italic;">"${p1.comment}"</p><p style="margin:8px 0 0;font-size:13px;color:${C.muted};font-weight:600;">â€” ${p1.clientName}</p>` : ''}
     </div>
     ${p(`Great reviews boost your ranking on VowConnect. Keep up the excellent work!`)}
-    ${btn('View All My Reviews →', `${APP}/vendor/analytics`, 'gold')}
+    ${btn('View All My Reviews â†’', `${APP}/vendor/analytics`, 'gold')}
   `)
   return sendEmail({
     from: getFrom(), to: p1.vendorEmail,
-    subject: `⭐ ${p1.clientName} gave you ${p1.rating} stars!`,
-    html: base(hero('⭐', 'New Review!', `${p1.clientName} reviewed ${p1.businessName}`, `135deg,${C.gold} 0%,#8B6A0A 100%`) + content, `${p1.rating}-star review from ${p1.clientName}`),
+    subject: `â­ ${p1.clientName} gave you ${p1.rating} stars!`,
+    html: base(hero('â­', 'New Review!', `${p1.clientName} reviewed ${p1.businessName}`, `135deg,${C.gold} 0%,#8B6A0A 100%`) + content, `${p1.rating}-star review from ${p1.clientName}`),
   })
 }
 
-/* ═══════════════════════════════════════════════
-   11 · SUBSCRIPTION UPGRADED → VENDOR
-═══════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   11 Â· SUBSCRIPTION UPGRADED â†’ VENDOR
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 export async function sendVendorUpgraded(p1: {
   vendorEmail: string; vendorName: string; businessName: string; plan: string; planExpiry: string
 }) {
@@ -468,102 +468,102 @@ export async function sendVendorUpgraded(p1: {
     ${h2(`${planLabel} plan activated, ${p1.vendorName.split(' ')[0]}!`)}
     ${p(`<strong>${p1.businessName}</strong> is now on the <strong>${planLabel} plan</strong>. Your new benefits are active immediately.`)}
     ${infoCard([
-      { icon: '📅', label: 'Plan',       value: `${planLabel} Plan` },
-      { icon: '⏰', label: 'Valid Until', value: p1.planExpiry },
-      { icon: '✓',  label: 'Status',     value: 'Active' },
+      { icon: 'ðŸ“…', label: 'Plan',       value: `${planLabel} Plan` },
+      { icon: 'â°', label: 'Valid Until', value: p1.planExpiry },
+      { icon: 'âœ“',  label: 'Status',     value: 'Active' },
     ])}
     ${perks[p1.plan.toLowerCase()] ? `
       <p style="font-size:14px;font-weight:700;color:${C.umber};margin:16px 0 8px;">Your ${planLabel} benefits:</p>
       ${checklist(perks[p1.plan.toLowerCase()])}` : ''}
-    ${btn('View My Dashboard →', `${APP}/vendor/dashboard`, 'gold')}
+    ${btn('View My Dashboard â†’', `${APP}/vendor/dashboard`, 'gold')}
   `)
   return sendEmail({
     from: getFrom(), to: p1.vendorEmail,
-    subject: `🚀 ${planLabel} plan activated for ${p1.businessName}`,
-    html: base(hero('🚀', `${planLabel} Plan Active!`, 'Your benefits are live right now', `135deg,${C.gold} 0%,#8B6A0A 100%`) + content, `Your ${planLabel} plan is now active`),
+    subject: `ðŸš€ ${planLabel} plan activated for ${p1.businessName}`,
+    html: base(hero('ðŸš€', `${planLabel} Plan Active!`, 'Your benefits are live right now', `135deg,${C.gold} 0%,#8B6A0A 100%`) + content, `Your ${planLabel} plan is now active`),
   })
 }
 
-/* ═══════════════════════════════════════════════
-   12 · EMAIL VERIFICATION
-═══════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   12 Â· EMAIL VERIFICATION
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 export async function sendEmailVerification(p1: { email: string; name: string; verifyUrl: string }) {
   const first = p1.name.split(' ')[0]
   const content = body(`
     ${h2(`Verify your email, ${first}`)}
     ${p('You\'re almost ready! Click the button below to verify your email address and unlock full access to VowConnect.')}
-    ${btn('Verify My Email →', p1.verifyUrl, 'dark')}
-    ${alert('⏰ This link expires in <strong>24 hours</strong>. If you didn\'t sign up, you can safely ignore this email.', 'gold')}
+    ${btn('Verify My Email â†’', p1.verifyUrl, 'dark')}
+    ${alert('â° This link expires in <strong>24 hours</strong>. If you didn\'t sign up, you can safely ignore this email.', 'gold')}
     ${p(`Or copy this link:<br/><span style="font-size:12px;color:${C.muted};word-break:break-all;">${p1.verifyUrl}</span>`, `color:${C.muted};font-size:13px;`)}
   `)
   return sendEmail({
     from: getFrom(), to: p1.email,
     subject: 'Verify your VowConnect email address',
-    html: base(hero('✉️', 'Verify Your Email', 'One click to activate your account') + content, 'Click to verify your VowConnect email address'),
+    html: base(hero('âœ‰ï¸', 'Verify Your Email', 'One click to activate your account') + content, 'Click to verify your VowConnect email address'),
   })
 }
 
-/* ═══════════════════════════════════════════════
-   13 · PASSWORD RESET
-═══════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   13 Â· PASSWORD RESET
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 export async function sendPasswordReset(p1: { email: string; name: string; resetUrl: string }) {
   const first = p1.name.split(' ')[0]
   const content = body(`
     ${h2(`Reset your password, ${first}`)}
     ${p('We received a request to reset the password for your VowConnect account. Click below to set a new password.')}
-    ${btn('Reset My Password →', p1.resetUrl, 'dark')}
-    ${alert('⏰ This link expires in <strong>1 hour</strong>. If you didn\'t request this, your password is safe — you can ignore this email.', 'gold')}
-    ${p('🔒 For your security, never share this link with anyone — including VowConnect support.', `color:${C.muted};font-size:13px;`)}
+    ${btn('Reset My Password â†’', p1.resetUrl, 'dark')}
+    ${alert('â° This link expires in <strong>1 hour</strong>. If you didn\'t request this, your password is safe â€” you can ignore this email.', 'gold')}
+    ${p('ðŸ”’ For your security, never share this link with anyone â€” including VowConnect support.', `color:${C.muted};font-size:13px;`)}
   `)
   return sendEmail({
     from: getFrom(), to: p1.email,
     subject: 'Reset your VowConnect password',
-    html: base(hero('🔐', 'Password Reset', 'Secure link — expires in 1 hour') + content, 'Reset your VowConnect account password'),
+    html: base(hero('ðŸ”', 'Password Reset', 'Secure link â€” expires in 1 hour') + content, 'Reset your VowConnect account password'),
   })
 }
 
-/* ═══════════════════════════════════════════════
-   14 · ADMIN BROADCAST
-═══════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   14 Â· ADMIN BROADCAST
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 export async function sendBroadcast(p1: { email: string; name: string; subject: string; message: string }) {
   const content = body(`
     ${h2(p1.subject)}
     ${p(`Hi <strong>${p1.name.split(' ')[0]}</strong>,`)}
     <div style="white-space:pre-line;font-size:15px;color:${C.text};line-height:1.7;">${p1.message}</div>
     ${hr()}
-    ${p(`— The VowConnect Team`, `color:${C.muted};font-size:13px;`)}
+    ${p(`â€” The VowConnect Team`, `color:${C.muted};font-size:13px;`)}
   `)
   return sendEmail({
     from: getFrom(), to: p1.email,
     subject: p1.subject,
-    html: base(hero('📢', p1.subject, 'From the VowConnect team') + content),
+    html: base(hero('ðŸ“¢', p1.subject, 'From the VowConnect team') + content),
   })
 }
 
-/* ═══════════════════════════════════════════════
-   15 · CONTACT FORM SUBMISSION → ADMIN
-═══════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   15 Â· CONTACT FORM SUBMISSION â†’ ADMIN
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 export async function sendContactFormToAdmin(p1: {
   name: string; email: string; topic: string; message: string
 }) {
   const content = body(`
     ${h2('New Contact Form Submission')}
     ${infoCard([
-      { icon: '👤', label: 'Name',  value: p1.name },
-      { icon: '✉️', label: 'Email', value: p1.email },
-      { icon: '📌', label: 'Topic', value: p1.topic },
+      { icon: 'ðŸ‘¤', label: 'Name',  value: p1.name },
+      { icon: 'âœ‰ï¸', label: 'Email', value: p1.email },
+      { icon: 'ðŸ“Œ', label: 'Topic', value: p1.topic },
     ])}
     <div style="background:${C.cream};border:1px solid ${C.border};border-radius:12px;padding:16px 20px;margin:16px 0;">
       <div style="font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:${C.muted};margin-bottom:8px;">Message</div>
       <p style="margin:0;font-size:14px;color:${C.text};line-height:1.7;">${p1.message}</p>
     </div>
-    ${btn(`Reply to ${p1.name} →`, `mailto:${p1.email}`, 'dark')}
+    ${btn(`Reply to ${p1.name} â†’`, `mailto:${p1.email}`, 'dark')}
   `)
   return sendEmail({
     from: getFrom(),
     to: process.env.SUPER_ADMIN_EMAIL ?? 'lamidecodes@gmail.com',
-    replyTo: p1.email,
-    subject: `[VowConnect] Contact: ${p1.topic} — ${p1.name}`,
-    html: base(hero('📩', 'New Contact Form', `From ${p1.name}`) + content),
+    subject: `[VowConnect] Contact: ${p1.topic} â€” ${p1.name}`,
+    html: base(hero('ðŸ“©', 'New Contact Form', `From ${p1.name}`) + content),
   })
 }
+

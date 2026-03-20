@@ -1,4 +1,4 @@
-﻿import { getCurrentUser } from '@/lib/auth'
+mport { getCurrentUser } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import MessagingUI from '@/components/messaging/MessagingUI'
 import DashboardShell from '@/components/layout/DashboardShell'
@@ -25,4 +25,5 @@ export default async function ClientMessagesPage() {
     </DashboardShell>
   )
 }
+
 

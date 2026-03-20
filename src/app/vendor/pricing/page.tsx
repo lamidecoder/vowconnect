@@ -185,3 +185,4 @@ function PricingInner() {
 export default function VendorPricingPage() {
   return <Suspense><PricingInner /></Suspense>
 }
+
