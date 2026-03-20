@@ -17,8 +17,8 @@ function GoogleIcon() {
 }
 
 const ROLES = [
-  { id: 'client', label: 'I\'m a Bride/Groom', sub: 'Find & book vendors for my wedding', icon: 'ðŸ‘°' },
-  { id: 'vendor', label: 'I\'m a Vendor',      sub: 'List my services & get booked',     icon: '🏪' },
+  { id: 'client', label: "I'm a Bride/Groom", sub: 'Find & book vendors for my wedding', icon: 'ðŸ‘°' },
+  { id: 'vendor', label: "I'm a Vendor",      sub: 'List my services & get booked',     icon: '🏪' },
 ]
 
 function RegisterForm() {
@@ -207,6 +207,8 @@ function RegisterForm() {
 export default function RegisterPage() {
   return <Suspense><RegisterForm /></Suspense>
 }
+
+
 
 
 
