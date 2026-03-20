@@ -1,10 +1,12 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
+import { ThemeToggle } from '@/components/layout/ThemeProvider'
 
 export const metadata: Metadata = {
-  title: 'VowConnect — Nigerian & Diaspora Wedding Vendor Marketplace',
-  description: 'Find and book verified Gele stylists, makeup artists, photographers, content creators, mobile photographers and more for your Nigerian wedding — in Lagos, London, Houston, Toronto and beyond.',
+  title: 'VowConnect – Find & Book Verified Nigerian Wedding Vendors Globally',
+  description: 'Find and book verified Gele stylists, makeup artists, photographers, content creators and more – in Lagos, London, Houston, Toronto and beyond.',
   openGraph: {
-    title: 'VowConnect — Nigerian Wedding Vendor Marketplace',
+    title: 'VowConnect – Nigerian Wedding Vendor Marketplace',
     description: 'Find and book verified Nigerian wedding vendors anywhere in the world.',
     url: 'https://vowconnect.com',
     siteName: 'VowConnect',
@@ -12,31 +14,30 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'VowConnect — Nigerian Wedding Vendor Marketplace',
+    title: 'VowConnect – Nigerian Wedding Vendor Marketplace',
     description: 'Find and book verified Nigerian wedding vendors anywhere in the world.',
   },
 }
 
-import Link from 'next/link'
-import { ThemeToggle } from '@/components/layout/ThemeProvider'
-
 const CATS = [
-  { name: 'Gele Stylist',    slug: 'gele-stylist',    emoji: '🧣', count: 48 },
-  { name: 'Makeup Artist',   slug: 'makeup-artist',   emoji: '💄', count: 62 },
-  { name: 'Photographer',    slug: 'photographer',    emoji: '📸', count: 35 },
-  { name: 'Event Decorator', slug: 'decorator',       emoji: '🌸', count: 29 },
-  { name: 'Caterer',         slug: 'caterer',         emoji: '🍽️', count: 41 },
-  { name: 'Cake Designer',   slug: 'cake-designer',   emoji: '🎂', count: 22 },
-  { name: 'DJ & MC',         slug: 'dj-mc',           emoji: '🎵', count: 17 },
-  { name: 'Wedding Planner',    slug: 'wedding-planner',    emoji: '📋', count: 14 },
-  { name: 'Content Creator',     slug: 'content-creator',     emoji: '🎬', count: 18 },
-  { name: 'Mobile Photographer', slug: 'mobile-photographer', emoji: '📱', count: 11 },
+  { name: 'Gele Stylist',       slug: 'gele-stylist',    emoji: '🧣', count: 48 },
+  { name: 'Makeup Artist',      slug: 'makeup-artist',   emoji: '💄', count: 62 },
+  { name: 'Photographer',       slug: 'photographer',    emoji: '📸', count: 35 },
+  { name: 'Event Decorator',    slug: 'decorator',       emoji: '🌸', count: 29 },
+  { name: 'Caterer',            slug: 'caterer',         emoji: '🍽️', count: 41 },
+  { name: 'Cake Designer',      slug: 'cake-designer',   emoji: '🎂', count: 22 },
+  { name: 'DJ & MC',            slug: 'dj-mc',           emoji: '🎵', count: 17 },
+  { name: 'Wedding Planner',    slug: 'wedding-planner', emoji: '📋', count: 14 },
+  { name: 'Content Creator',    slug: 'content-creator', emoji: '🎬', count: 18 },
+  { name: 'Fashion Designer',   slug: 'fashion-designer',emoji: '👗', count: 11 },
+  { name: 'Sound Engineer',     slug: 'sound-engineer',  emoji: '🎛️', count: 8  },
+  { name: 'Videographer',       slug: 'videographer',    emoji: '🎥', count: 24 },
 ]
 
 const VENDORS = [
-  { name: 'Adaeze Gele & Bridal',   area: 'Victoria Island, Lagos', cat: 'Gele Stylist',  price: '₦25k–150k',  rating: 4.9, reviews: 47, e: '🧣', tag: 'Most Booked' },
-  { name: "Fatima's Gele Studio",   area: 'Peckham, London',        cat: 'Gele Stylist',  price: '£80–350',    rating: 5.0, reviews: 31, e: '🧣', tag: 'UK Top Pick'  },
-  { name: "Tolu's Beauty Studio",   area: 'Lekki Phase 1, Lagos',   cat: 'Makeup Artist', price: '₦30k–120k',  rating: 4.8, reviews: 89, e: '💄', tag: 'Top Rated'    },
+  { name: 'Adaeze Gele & Bridal', area: 'Victoria Island, Lagos', cat: 'Gele Stylist',  price: '₦25k–150k', rating: 4.9, reviews: 47, e: '🧣', tag: 'Most Booked' },
+  { name: "Fatima's Gele Studio", area: 'Peckham, London',        cat: 'Gele Stylist',  price: '£80–350',   rating: 5.0, reviews: 31, e: '🧣', tag: 'UK Top Pick'  },
+  { name: "Tolu's Beauty Studio", area: 'Lekki Phase 1, Lagos',   cat: 'Makeup Artist', price: '₦30k–120k', rating: 4.8, reviews: 89, e: '💄', tag: 'Top Rated'    },
 ]
 
 const LOCATIONS = [
@@ -50,21 +51,21 @@ const LOCATIONS = [
 
 const STEPS = [
   { n: '01', title: 'Browse & Discover', body: 'Search by category, city, and budget. View real portfolios and verified reviews from brides across Nigeria and the diaspora.' },
-  { n: '02', title: 'Book & Connect',    body: 'Send a booking request in 60 seconds. Chat on WhatsApp. Vendors respond within hours, wherever they are in the world.' },
+  { n: '02', title: 'Book & Connect',    body: 'Send a booking request in 60 seconds. Chat directly with vendors. They respond within hours, wherever in the world.' },
   { n: '03', title: 'Celebrate',         body: 'Show up on your day with total confidence. Your vendor is verified, confirmed, and ready to make magic.' },
 ]
 
 const REVIEWS = [
-  { name: 'Chioma Okafor',  role: 'Bride · Lekki 2024',       text: 'Found my Gele stylist in 10 minutes. She was breathtaking. VowConnect is a lifesaver for Nigerian brides.',     init: 'C' },
-  { name: 'Bisi Adeyemi',   role: 'MOB · London 2024',        text: 'Planning a Nigerian wedding from London felt impossible until VowConnect. Connected us with vendors back home seamlessly.', init: 'B' },
-  { name: 'Amaka Obi',      role: 'Bride · Houston 2024',     text: 'As a Nigerian-American bride I needed authentic vendors. VowConnect understood exactly what I was looking for.',  init: 'A' },
+  { name: 'Chioma Okafor', role: 'Bride · Lekki 2024',    text: 'Found my Gele stylist in 10 minutes. She was breathtaking. VowConnect is a lifesaver for Nigerian brides.',     init: 'C' },
+  { name: 'Bisi Adeyemi',  role: 'MOB · London 2024',     text: 'Planning a Nigerian wedding from London felt impossible until VowConnect. Connected us with vendors back home seamlessly.', init: 'B' },
+  { name: 'Amaka Obi',     role: 'Bride · Houston 2024',  text: 'As a Nigerian-American bride I needed authentic vendors. VowConnect understood exactly what I was looking for.',  init: 'A' },
 ]
 
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-theme overflow-x-hidden">
 
-      {/* ── NAV ── */}
+      {/* NAV */}
       <nav className="fixed top-0 left-0 right-0 z-50 glass-nav">
         <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-1 group">
@@ -84,11 +85,10 @@ export default function HomePage() {
         </div>
       </nav>
 
-      {/* ── HERO ── */}
+      {/* HERO */}
       <section className="relative min-h-screen flex items-center overflow-hidden">
         <div className="absolute inset-0 bg-[#080808]" />
         <div className="absolute inset-0 grid-lines" />
-        {/* Warm glow */}
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/3 w-[900px] h-[700px] rounded-full pointer-events-none"
           style={{ background: 'radial-gradient(ellipse, rgba(200,169,110,0.11) 0%, transparent 60%)' }} />
         <div className="absolute bottom-0 right-0 w-1/2 h-2/3 pointer-events-none"
@@ -104,32 +104,59 @@ export default function HomePage() {
 
             {/* Headline */}
             <h1 className="font-display text-[clamp(44px,7.5vw,96px)] leading-[0.92] text-white mb-8 animate-fade-up tracking-tight">
-              Your dream<br />
-              <span className="text-sand-grad">Nigerian wedding</span><br />
-              <span className="italic text-white/30">anywhere in the world.</span>
+              Find & Book Verified<br />
+              <span className="text-sand-grad">Nigerian Wedding</span><br />
+              <span className="italic text-white/30">Vendors Globally.</span>
             </h1>
 
             <p className="text-white/40 text-lg md:text-xl font-light max-w-lg mb-10 leading-relaxed animate-fade-up" style={{ animationDelay: '100ms' }}>
-              Find and book verified Gele stylists, makeup artists, photographers, content creators and more — in Lagos, London, Houston, Toronto and beyond.
+              Gele stylists, makeup artists, photographers & more — in Lagos, London, Houston, Toronto and beyond.
             </p>
 
-            <div className="flex flex-wrap items-center gap-4 animate-fade-up" style={{ animationDelay: '200ms' }}>
-              <Link href="/find-my-vendor"
+            {/* Category shortcuts */}
+            <div className="flex flex-wrap gap-2 mb-8 animate-fade-up" style={{ animationDelay: '150ms' }}>
+              {[
+                { label:'Gele Stylists', slug:'gele-stylist',  emoji:'🧣' },
+                { label:'Makeup',        slug:'makeup-artist', emoji:'💄' },
+                { label:'Photography',   slug:'photographer',  emoji:'📸' },
+                { label:'Decor',         slug:'decorator',     emoji:'🌸' },
+                { label:'Catering',      slug:'caterer',       emoji:'🍽️' },
+                { label:'DJ & MC',       slug:'dj-mc',         emoji:'🎵' },
+              ].map(c => (
+                <Link key={c.slug} href={`/vendors?category=${c.slug}`}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all hover:scale-105"
+                  style={{ background:'rgba(200,169,110,0.12)', border:'1px solid rgba(200,169,110,0.25)', color:'#C8A96E' }}>
+                  <span>{c.emoji}</span> {c.label}
+                </Link>
+              ))}
+            </div>
+
+            {/* CTAs + location filter */}
+            <div className="flex flex-wrap items-center gap-3 mb-4 animate-fade-up" style={{ animationDelay: '200ms' }}>
+              <Link href="/vendors"
                 style={{ background: 'linear-gradient(135deg,#C9941A,#E4B520)', boxShadow: '0 4px 20px rgba(201,148,26,0.4)' }}
                 className="px-8 py-4 text-base rounded-full text-white font-bold hover:opacity-90 transition-opacity">
                 ✨ Find My Vendors
               </Link>
-              <Link href="/vendors" className="btn-sand px-8 py-4 text-base rounded-full">
-                Browse Vendors →
-              </Link>
-              <Link href="/register" className="group flex items-center gap-2.5 text-white/40 hover:text-white text-sm font-medium transition-colors">
-                <span className="w-9 h-9 rounded-full border border-white/15 flex items-center justify-center group-hover:border-[#C8A96E] group-hover:text-[#C8A96E] transition-all">+</span>
-                List Your Business Free
+              <Link href="/vendors" className="btn-sand px-6 py-4 text-base rounded-full">
+                Browse All →
               </Link>
             </div>
 
+            {/* Location selector */}
+            <div className="flex flex-wrap gap-2 mb-10 animate-fade-up" style={{ animationDelay: '250ms' }}>
+              <span className="text-white/20 text-xs self-center">Browse by city:</span>
+              {LOCATIONS.map(l => (
+                <Link key={l.city} href={`/vendors?city=${l.city.toLowerCase()}`}
+                  className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium transition-all hover:opacity-80"
+                  style={{ background:'rgba(255,255,255,0.06)', border:'1px solid rgba(255,255,255,0.08)', color:'rgba(255,255,255,0.4)' }}>
+                  {l.flag} {l.city}
+                </Link>
+              ))}
+            </div>
+
             {/* Stats */}
-            <div className="flex flex-wrap gap-8 md:gap-12 mt-14 pt-12 border-t border-white/6 animate-fade-up" style={{ animationDelay: '300ms' }}>
+            <div className="flex flex-wrap gap-8 md:gap-12 pt-8 border-t border-white/6 animate-fade-up" style={{ animationDelay: '300ms' }}>
               {[['500+','Verified Vendors'],['2,400+','Bookings Done'],['4.9 ★','Avg Rating'],['6','Countries']].map(([v,l]) => (
                 <div key={l}>
                   <div className="font-display text-2xl text-white">{v}</div>
@@ -160,7 +187,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── LOCATIONS STRIP ── */}
+      {/* LOCATIONS STRIP */}
       <div className="bg-[#0D0D0D] border-y border-white/6 py-5 overflow-hidden">
         <div className="flex gap-10 animate-[shimmer_20s_linear_infinite] whitespace-nowrap px-6">
           {[...LOCATIONS,...LOCATIONS].map((l, i) => (
@@ -173,7 +200,25 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* ── CATEGORIES ── */}
+      {/* VENDOR CTA BANNER */}
+      <div className="bg-[#0D0D0D] border-b border-white/6 py-4 px-4">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">🏪</span>
+            <div>
+              <span className="text-white/70 text-sm font-semibold">Are you a vendor?</span>
+              <span className="text-white/30 text-sm ml-2">Join 500+ professionals already getting booked every week.</span>
+            </div>
+          </div>
+          <Link href="/register?role=vendor"
+            className="flex-shrink-0 px-5 py-2 rounded-full text-sm font-bold transition-all hover:opacity-90"
+            style={{ background:'linear-gradient(135deg,#C9941A,#E4B520)', color:'white' }}>
+            List Your Business Free →
+          </Link>
+        </div>
+      </div>
+
+      {/* CATEGORIES */}
       <section className="py-24 md:py-32 px-4 md:px-6">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 md:mb-16 gap-6">
@@ -198,7 +243,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── FEATURED VENDORS ── */}
+      {/* FEATURED VENDORS */}
       <section className="py-24 md:py-32 px-4 md:px-6 bg-[#080808] relative overflow-hidden">
         <div className="absolute inset-0 grid-lines opacity-50" />
         <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full pointer-events-none"
@@ -241,7 +286,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── HOW IT WORKS ── */}
+      {/* HOW IT WORKS */}
       <section id="how" className="py-24 md:py-32 px-4 md:px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16 md:mb-20">
@@ -263,7 +308,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── REVIEWS ── */}
+      {/* REVIEWS */}
       <section className="py-24 md:py-32 px-4 md:px-6 bg-theme-subtle">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-14">
@@ -289,7 +334,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── FOR VENDORS ── */}
+      {/* FOR VENDORS */}
       <section id="vendors" className="py-24 md:py-32 px-4 md:px-6">
         <div className="max-w-7xl mx-auto">
           <div className="rounded-3xl bg-[#080808] overflow-hidden relative p-10 md:p-20">
@@ -303,7 +348,7 @@ export default function HomePage() {
                 <span className="text-sand-grad">Nigeria & diaspora</span>
               </h2>
               <p className="text-white/35 text-base leading-relaxed mb-10">
-                List your business free on VowConnect. Get discovered by brides in Lagos, London, New York, Toronto and beyond.
+                List your business free on VowConnect. Get discovered by brides in Lagos, London, New York, Toronto and beyond. No commission. No setup fee.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link href="/register?role=vendor" className="btn-sand px-8 py-4 text-base rounded-full">
@@ -326,7 +371,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── FOOTER ── */}
+      {/* FOOTER */}
       <footer className="bg-[#080808] border-t border-white/5 py-14 px-4 md:px-6">
         <div className="max-w-7xl mx-auto">
           <div className="grid sm:grid-cols-2 md:grid-cols-5 gap-10 mb-12">
@@ -345,9 +390,9 @@ export default function HomePage() {
               </div>
             </div>
             {[
-              { t: 'For Clients',  l: [['✨ Find My Vendors','/find-my-vendor'],['Browse Vendors','/vendors'],['How It Works','/how-it-works'],['FAQ','/faq'],['Contact','/contact']] },
-              { t: 'For Vendors',  l: [['List Business','/register?role=vendor'],['Vendor Guide','/vendor-guide'],['Pricing','/pricing'],['FAQ','/faq']] },
-              { t: 'Company',      l: [['About','/about'],['Blog','/blog'],['Features','/features'],['Contact','/contact']] },
+              { t: 'For Clients', l: [['✨ Find My Vendors','/vendors'],['Browse Vendors','/vendors'],['How It Works','/how-it-works'],['FAQ','/faq'],['Contact','/contact']] },
+              { t: 'For Vendors', l: [['List Business','/register?role=vendor'],['Vendor Guide','/vendor-guide'],['Pricing','/pricing'],['FAQ','/faq']] },
+              { t: 'Company',     l: [['About','/about'],['Blog','/blog'],['Features','/features'],['Contact','/contact']] },
             ].map(col => (
               <div key={col.t}>
                 <h4 className="text-white/35 font-bold text-[9px] mb-4 uppercase tracking-[0.2em]">{col.t}</h4>
