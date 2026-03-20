@@ -1,7 +1,7 @@
-// src/lib/stripe.ts
+﻿// src/lib/stripe.ts
 // Stripe handles international payments (UK, US, EU, CA, AU etc.)
 // Paystack handles Africa (NG, GH, KE, ZA)
-// Logic: detect vendor country → route to correct gateway
+// Logic: detect vendor country â†’ route to correct gateway
 // Docs: https://stripe.com/docs
 // Install: npm install stripe @stripe/stripe-js
 
@@ -9,20 +9,20 @@ import Stripe from 'stripe'
 
 const STRIPE_KEY = process.env.STRIPE_SECRET_KEY ?? ''
 export const stripe = (STRIPE_KEY && !STRIPE_KEY.includes('xxx'))
-  ? new Stripe(STRIPE_KEY, { apiVersion: '2024-12-18.acacia', typescript: true })
+  ? new Stripe(STRIPE_KEY, { apiVersion: '2025-02-24.acacia', typescript: true })
   : null
 
 export const STRIPE_PLANS: Record<string, { name: string; monthlyPriceId: string; price: number; currency: string }> = {
   pro: {
     name:           'Pro',
     monthlyPriceId: process.env.STRIPE_PRO_PRICE_ID    ?? 'price_pro_monthly',
-    price:          8,    // £8 / $10 / €9
+    price:          8,    // Â£8 / $10 / â‚¬9
     currency:       'gbp',
   },
   premium: {
     name:           'Premium',
     monthlyPriceId: process.env.STRIPE_PREMIUM_PRICE_ID ?? 'price_premium_monthly',
-    price:          20,   // £20 / $25 / €22
+    price:          20,   // Â£20 / $25 / â‚¬22
     currency:       'gbp',
   },
 }
@@ -59,9 +59,9 @@ export function getCurrencyForCountry(country: string): string {
 
 export function getCurrencySymbol(currency: string): string {
   const map: Record<string, string> = {
-    NGN: '₦', GBP: '£', USD: '$', EUR: '€', CAD: 'CA$',
-    AUD: 'A$', GHS: 'GH₵', KES: 'KSh', ZAR: 'R',
-    JPY: '¥', SGD: 'S$', AED: 'AED', SAR: 'SAR', INR: '₹',
+    NGN: 'â‚¦', GBP: 'Â£', USD: '$', EUR: 'â‚¬', CAD: 'CA$',
+    AUD: 'A$', GHS: 'GHâ‚µ', KES: 'KSh', ZAR: 'R',
+    JPY: 'Â¥', SGD: 'S$', AED: 'AED', SAR: 'SAR', INR: 'â‚¹',
   }
   return map[currency] ?? currency
 }
@@ -134,7 +134,7 @@ export async function createStripeDepositSession(params: {
         currency:     params.currency.toLowerCase(),
         unit_amount:  params.amount * 100,
         product_data: {
-          name:        `Booking Deposit — ${params.vendorName}`,
+          name:        `Booking Deposit â€” ${params.vendorName}`,
           description: `${params.eventType} event deposit`,
         },
       },
@@ -147,3 +147,4 @@ export async function createStripeDepositSession(params: {
 
   return session
 }
+
