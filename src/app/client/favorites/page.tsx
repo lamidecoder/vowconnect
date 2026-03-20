@@ -1,4 +1,4 @@
-mport { getCurrentUser } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { redirect } from 'next/navigation'
 import { formatPrice } from '@/lib/utils'
