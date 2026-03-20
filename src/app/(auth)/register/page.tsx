@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import { useState, Suspense } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -17,8 +17,8 @@ function GoogleIcon() {
 }
 
 const ROLES = [
-  { id: 'client', label: 'I\'m a Bride/Groom', sub: 'Find & book vendors for my wedding', icon: '👰' },
-  { id: 'vendor', label: 'I\'m a Vendor',      sub: 'List my services & get booked',     icon: '🧣' },
+  { id: 'client', label: 'I\'m a Bride/Groom', sub: 'Find & book vendors for my wedding', icon: 'ðŸ‘°' },
+  { id: 'vendor', label: 'I\'m a Vendor',      sub: 'List my services & get booked',     icon: 'ðŸ§£' },
 ]
 
 function RegisterForm() {
@@ -49,7 +49,7 @@ function RegisterForm() {
     const data = await res.json()
     if (!res.ok) { setError(data.error ?? 'Registration failed'); setLoading(false); return }
     const dest = next || (role === 'vendor' ? '/vendor/onboarding' : '/client/dashboard')
-    window.location.href = safeRedirectPath(dest, defaultDest)
+    window.location.href = dest
   }
 
   const googleUrl = `/api/auth/google?role=${role.toUpperCase()}${next ? `&next=${encodeURIComponent(next)}` : ''}`
@@ -82,7 +82,7 @@ function RegisterForm() {
             ))}
           </div>
         </div>
-        <p className="relative z-10 text-white/10 text-xs">© {new Date().getFullYear()} VowConnect</p>
+        <p className="relative z-10 text-white/10 text-xs">Â© {new Date().getFullYear()} VowConnect</p>
       </div>
 
       {/* Right */}
@@ -96,7 +96,7 @@ function RegisterForm() {
           {/* Prompted banner */}
           {prompted && (
             <div className="mb-6 p-4 rounded-2xl bg-[#C8A96E]/10 border border-[#C8A96E]/30">
-              <p className="text-sm font-semibold text-[#C8A96E]">🔒 Create a free account to view vendor profiles</p>
+              <p className="text-sm font-semibold text-[#C8A96E]">ðŸ”’ Create a free account to view vendor profiles</p>
               <p className="text-xs text-theme-muted mt-1">Join thousands of couples and vendors across 6 countries</p>
             </div>
           )}
@@ -115,7 +115,7 @@ function RegisterForm() {
                       <div className="font-semibold text-theme">{r.label}</div>
                       <div className="text-xs text-theme-muted mt-0.5">{r.sub}</div>
                     </div>
-                    <span className="ml-auto text-theme-faint">→</span>
+                    <span className="ml-auto text-theme-faint">â†’</span>
                   </button>
                 ))}
               </div>
@@ -183,7 +183,7 @@ function RegisterForm() {
                   <input className="input" type="tel" name="phone" placeholder="+44 7911 123456" value={form.phone} onChange={handle}/>
                 </div>
                 <button type="submit" disabled={loading} className="btn-primary w-full justify-center py-3 disabled:opacity-60 mt-2">
-                  {loading ? 'Creating account...' : 'Create Account →'}
+                  {loading ? 'Creating account...' : 'Create Account â†’'}
                 </button>
               </form>
 
@@ -207,3 +207,4 @@ function RegisterForm() {
 export default function RegisterPage() {
   return <Suspense><RegisterForm /></Suspense>
 }
+
