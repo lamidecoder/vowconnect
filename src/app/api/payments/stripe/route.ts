@@ -9,13 +9,10 @@ export async function POST(req: NextRequest) {
   const auth = await requireRole(req, ['VENDOR', 'SUPER_ADMIN'])
   if ('error' in auth) return auth.error
 
-, { status: 503 })
-  }
 
   const { plan } = await req.json()
   if (!['pro', 'premium'].includes(plan)) {
     return NextResponse.json({ error: 'Invalid plan' }, { status: 400 })
-  }
 
   const user = await prisma.user.findUnique({
     where: { id: auth.userId },
@@ -40,4 +37,5 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ checkoutUrl: session.url, sessionId: session.id })
 }
+
 
