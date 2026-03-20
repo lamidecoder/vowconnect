@@ -1,0 +1,786 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "windows", "linux-musl-openssl-3.0.x", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CLIENT
+  VENDOR
+  PLANNER
+  SUPER_ADMIN
+}
+
+enum BookingStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  COMPLETED
+  CANCELLED
+}
+
+enum VendorStatus {
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+enum Currency {
+  NGN
+  GBP
+  USD
+  EUR
+  CAD
+  AUD
+  ZAR
+  GHS
+  KES
+}
+
+model User {
+  id          String    @id @default(cuid())
+  email       String    @unique
+  name        String
+  phone       String?
+  avatar      String?
+  role        Role      @default(CLIENT)
+  isActive        Boolean   @default(true)
+  emailVerified   Boolean   @default(false)
+  emailVerifyToken String?  @unique
+  googleId         String?  @unique
+  emailVerifyExpiry DateTime?
+  passwordHash  String?
+  country     String?   @default("NG")   // ISO 3166-1 alpha-2
+  timezone    String?   @default("Africa/Lagos")
+  locale      String?   @default("en-NG")
+  deletedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  vendor         Vendor?
+  bookings       Booking[]      @relation("ClientBookings")
+  reviews        Review[]
+  favorites      Favorite[]
+  reports        Report[]       @relation("Reporter")
+  adminLogs      AdminLog[]
+  asoebiLed      AsoebiGroup[]  @relation("AsoebiLead")
+  asoebiJoined   AsoebiMember[] @relation("AsoebiMemberships")
+  passwordResets PasswordResetToken[]
+  // New features
+  weddingProfile    WeddingProfile?
+  sentMessages      Message[]          @relation("SentMessages")
+  conversations     Conversation[]     @relation("ClientConversations")
+  supportTickets    SupportTicket[]
+  clientQuotes      Quote[]            @relation("ClientQuotes")
+  clientNotes       ClientNote[]       @relation("ClientNotesReceived")
+  followUpReminders FollowUpReminder[] @relation("FollowUpReminders")
+  referralsSent     Referral[]         @relation("ReferralsSent")
+  referralsReceived Referral[]         @relation("ReferralsReceived")
+  realWeddings      RealWedding[]      @relation("ClientRealWeddings")
+  videoTestimonials VideoTestimonial[] @relation("ClientTestimonials")
+  plannerProfile    PlannerProfile?
+  plannerClients    PlannerClient[]    @relation("PlannerClients")
+
+  @@index([email])
+  @@index([role])
+  @@index([country])
+}
+
+model Category {
+  id       String   @id @default(cuid())
+  name     String   @unique
+  slug     String   @unique
+  emoji    String   @default("🎀")
+  isActive Boolean  @default(true)
+  vendors  Vendor[]
+}
+
+model Vendor {
+  id           String       @id @default(cuid())
+  userId       String       @unique
+  businessName String
+  bio          String?
+  categoryId   String
+  // Location — worldwide
+  location     String                       // Human-readable: "Brixton, London"
+  city         String?                      // "London"
+  country      String       @default("NG") // ISO code: "GB", "US", "NG"
+  countryName  String?                     // "United Kingdom"
+  lgaArea      String?                     // Nigerian LGA (legacy)
+  latitude     Float?
+  longitude    Float?
+  // Pricing — multi-currency
+  priceMin     Int
+  priceMax     Int
+  currency     Currency     @default(NGN)
+  // Contact
+  whatsapp     String
+  instagram    String?
+  website      String?
+  // Status
+  isAvailable  Boolean      @default(true)
+  isVerified   Boolean      @default(false)
+  isFeatured   Boolean      @default(false)
+  isDiaspora   Boolean      @default(false)  // Serves diaspora clients (travels/ships internationally)
+  servesCountries String?                    // JSON array of ISO codes e.g. '["NG","GB","US"]'
+  status       VendorStatus @default(PENDING_REVIEW)
+  profileViews Int          @default(0)
+  // Subscription
+  plan         String       @default("free")   // free | pro | premium
+  planExpiry   DateTime?
+  stripeCustomerId String?
+  stripeSubId      String?
+  deletedAt    DateTime?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  user         User             @relation(fields: [userId], references: [id])
+  category     Category         @relation(fields: [categoryId], references: [id])
+  portfolio    PortfolioImage[]
+  bookings     Booking[]
+  reviews      Review[]
+  favorites    Favorite[]
+  reports      Report[]         @relation("ReportedVendor")
+  blockedDates BlockedDate[]
+  asoebiGroups AsoebiGroup[]
+  analytics    AnalyticsEvent[]
+  // New features
+  conversations    Conversation[]
+  packages         VendorPackage[]
+  quotes           Quote[]
+  clientNotes      ClientNote[]
+  followUps        FollowUpReminder[]
+  bundleItems      BundleItem[]
+  realWeddings     RealWedding[]
+  videoTestimonials VideoTestimonial[]
+
+  @@index([categoryId])
+  @@index([country])
+  @@index([city])
+  @@index([status])
+  @@index([currency])
+}
+
+model PortfolioImage {
+  id           String   @id @default(cuid())
+  vendorId     String
+  url          String
+  cloudinaryId String
+  mediaType    String   @default("image")  // "image" | "video"
+  thumbnailUrl String?  // for videos
+  caption      String?
+  order        Int      @default(0)
+  createdAt    DateTime @default(now())
+  vendor       Vendor   @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  @@index([vendorId])
+}
+
+model Booking {
+  id           String        @id @default(cuid())
+  clientId     String
+  vendorId     String
+  eventDate    DateTime
+  eventType    String
+  location     String?
+  guestCount   Int?
+  budget       Int?
+  currency     Currency      @default(NGN)
+  notes        String?
+  status       BookingStatus @default(PENDING)
+  overriddenBy String?
+  // Deposit / payment
+  depositAmount   Int?
+  depositPaid     Boolean  @default(false)
+  depositRef      String?
+  stripePaymentId String?
+  deletedAt    DateTime?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  client User   @relation("ClientBookings", fields: [clientId], references: [id])
+  vendor Vendor @relation(fields: [vendorId], references: [id])
+  review Review?
+
+  @@index([clientId])
+  @@index([vendorId])
+  @@index([status])
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  bookingId String   @unique
+  clientId  String
+  vendorId  String
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+
+  booking Booking @relation(fields: [bookingId], references: [id])
+  client  User    @relation(fields: [clientId], references: [id])
+  vendor  Vendor  @relation(fields: [vendorId], references: [id])
+  @@index([vendorId])
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  vendorId  String
+  createdAt DateTime @default(now())
+  user   User   @relation(fields: [userId], references: [id])
+  vendor Vendor @relation(fields: [vendorId], references: [id])
+  @@unique([userId, vendorId])
+}
+
+model Report {
+  id          String   @id @default(cuid())
+  reporterId  String
+  targetType  String   @default("vendor")
+  targetId    String
+  reason      String
+  description String?
+  status      String   @default("OPEN")   // OPEN | RESOLVED | DISMISSED
+  createdAt   DateTime @default(now())
+  reporter User @relation("Reporter", fields: [reporterId], references: [id])
+  vendor   Vendor? @relation("ReportedVendor", fields: [targetId], references: [id])
+  @@index([status])
+}
+
+model AdminLog {
+  id         String   @id @default(cuid())
+  adminId    String
+  action     String
+  targetType String
+  targetId   String?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+  admin User @relation(fields: [adminId], references: [id])
+  @@index([adminId])
+  @@index([createdAt])
+}
+
+model SystemSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+// ── Availability Calendar ─────────────────────────────────────
+model BlockedDate {
+  id        String   @id @default(cuid())
+  vendorId  String
+  date      DateTime @db.Date
+  reason    String?
+  createdAt DateTime @default(now())
+  vendor    Vendor   @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  @@unique([vendorId, date])
+  @@index([vendorId])
+}
+
+// ── Asoebi Group Booking ─────────────────────────────────────
+model AsoebiGroup {
+  id           String   @id @default(cuid())
+  leadClientId String
+  vendorId     String
+  eventDate    DateTime
+  eventType    String
+  location     String?
+  maxSlots     Int      @default(12)
+  notes        String?
+  status       String   @default("OPEN")
+  shareCode    String   @unique
+  currency     Currency @default(NGN)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  leadClient   User           @relation("AsoebiLead", fields: [leadClientId], references: [id])
+  vendor       Vendor         @relation(fields: [vendorId], references: [id])
+  members      AsoebiMember[]
+  @@index([vendorId])
+  @@index([leadClientId])
+  @@index([shareCode])
+}
+
+model AsoebiMember {
+  id       String   @id @default(cuid())
+  groupId  String
+  clientId String?
+  name     String
+  phone    String?
+  status   String   @default("JOINED")
+  joinedAt DateTime @default(now())
+  group    AsoebiGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  client   User?       @relation("AsoebiMemberships", fields: [clientId], references: [id])
+  @@unique([groupId, clientId])
+  @@index([groupId])
+}
+
+// ── WhatsApp Log ─────────────────────────────────────────────
+model WhatsAppLog {
+  id         String   @id @default(cuid())
+  vendorId   String?
+  clientId   String?
+  bookingId  String?
+  phone      String
+  message    String
+  type       String
+  status     String   @default("SENT")
+  externalId String?
+  createdAt  DateTime @default(now())
+  @@index([vendorId])
+  @@index([bookingId])
+}
+
+// ── Analytics Events ─────────────────────────────────────────
+model AnalyticsEvent {
+  id        String   @id @default(cuid())
+  vendorId  String
+  type      String
+  imageId   String?
+  country   String?
+  source    String?
+  createdAt DateTime @default(now())
+  vendor    Vendor   @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  @@index([vendorId])
+  @@index([type])
+  @@index([createdAt])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ── Wedding Planning Suite ────────────────────────────────────
+
+enum RsvpStatus {
+  PENDING
+  ATTENDING
+  DECLINED
+  MAYBE
+}
+
+model WeddingProfile {
+  id           String    @id @default(cuid())
+  clientId     String    @unique
+  partnerName  String?
+  weddingDate  DateTime?
+  venue        String?
+  city         String?
+  country      String?
+  totalBudget  Int?
+  currency     Currency  @default(NGN)
+  guestCount   Int?
+  theme        String?
+  notes        String?
+  isPublic     Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  client        User            @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  budgetItems   BudgetItem[]
+  guestList     Guest[]
+  moodBoard     MoodBoardPin[]
+  timelineItems TimelineItem[]
+
+  @@index([clientId])
+}
+
+model BudgetItem {
+  id               String   @id @default(cuid())
+  weddingProfileId String
+  category         String   // "Gele Stylist", "Photography", etc.
+  label            String
+  estimatedAmount  Int      @default(0)
+  actualAmount     Int      @default(0)
+  isPaid           Boolean  @default(false)
+  vendorId         String?
+  bookingId        String?
+  notes            String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  weddingProfile WeddingProfile @relation(fields: [weddingProfileId], references: [id], onDelete: Cascade)
+
+  @@index([weddingProfileId])
+}
+
+model Guest {
+  id               String     @id @default(cuid())
+  weddingProfileId String
+  name             String
+  email            String?
+  phone            String?
+  side             String?    // "bride" | "groom" | "both"
+  rsvpStatus       RsvpStatus @default(PENDING)
+  dietaryNeeds     String?
+  tableNumber      Int?
+  plusOne          Boolean    @default(false)
+  plusOneName      String?
+  notes            String?
+  inviteSent       Boolean    @default(false)
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  weddingProfile WeddingProfile @relation(fields: [weddingProfileId], references: [id], onDelete: Cascade)
+
+  @@index([weddingProfileId])
+  @@index([rsvpStatus])
+}
+
+model MoodBoardPin {
+  id               String   @id @default(cuid())
+  weddingProfileId String
+  imageUrl         String
+  caption          String?
+  sourceVendorId   String?
+  sourceUrl        String?
+  category         String?  // "dress", "decor", "makeup", "gele", etc.
+  order            Int      @default(0)
+  createdAt        DateTime @default(now())
+
+  weddingProfile WeddingProfile @relation(fields: [weddingProfileId], references: [id], onDelete: Cascade)
+
+  @@index([weddingProfileId])
+}
+
+model TimelineItem {
+  id               String    @id @default(cuid())
+  weddingProfileId String
+  title            String
+  description      String?
+  dueDate          DateTime?
+  category         String?   // "booking", "admin", "beauty", "decor", etc.
+  isCompleted      Boolean   @default(false)
+  vendorCategory   String?   // if linked to a vendor category
+  priority         String    @default("medium") // low | medium | high
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  weddingProfile WeddingProfile @relation(fields: [weddingProfileId], references: [id], onDelete: Cascade)
+
+  @@index([weddingProfileId])
+}
+
+// ── Vendor Enquiry / Messaging ────────────────────────────────
+
+model Conversation {
+  id         String   @id @default(cuid())
+  clientId   String
+  vendorId   String
+  bookingId  String?
+  lastMsgAt  DateTime @default(now())
+  createdAt  DateTime @default(now())
+
+  client   User     @relation("ClientConversations", fields: [clientId], references: [id])
+  vendor   Vendor   @relation(fields: [vendorId], references: [id])
+  messages Message[]
+
+  @@unique([clientId, vendorId])
+  @@index([clientId])
+  @@index([vendorId])
+}
+
+model Message {
+  id             String   @id @default(cuid())
+  conversationId String
+  senderId       String
+  body           String
+  isRead         Boolean  @default(false)
+  templateId     String?
+  createdAt      DateTime @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User         @relation("SentMessages", fields: [senderId], references: [id])
+
+  @@index([conversationId])
+  @@index([senderId])
+}
+
+// ── Quote Builder ─────────────────────────────────────────────
+
+model VendorPackage {
+  id          String   @id @default(cuid())
+  vendorId    String
+  name        String
+  description String?
+  price       Int
+  currency    Currency @default(NGN)
+  duration    String?  // e.g. "4 hours", "full day"
+  includes    String[] // list of inclusions
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  vendor     Vendor       @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  quoteItems QuoteItem[]
+
+  @@index([vendorId])
+}
+
+model Quote {
+  id         String   @id @default(cuid())
+  clientId   String
+  vendorId   String
+  status     String   @default("DRAFT") // DRAFT | SENT | ACCEPTED | DECLINED | EXPIRED
+  totalAmount Int
+  currency   Currency @default(NGN)
+  validUntil DateTime?
+  notes      String?
+  bookingId  String?  @unique
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  client User         @relation("ClientQuotes", fields: [clientId], references: [id])
+  vendor Vendor       @relation(fields: [vendorId], references: [id])
+  items  QuoteItem[]
+
+  @@index([clientId])
+  @@index([vendorId])
+  @@index([status])
+}
+
+model QuoteItem {
+  id        String  @id @default(cuid())
+  quoteId   String
+  packageId String?
+  label     String
+  price     Int
+  quantity  Int     @default(1)
+
+  quote   Quote          @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  package VendorPackage? @relation(fields: [packageId], references: [id])
+
+  @@index([quoteId])
+}
+
+// ── Vendor CRM ────────────────────────────────────────────────
+
+model ClientNote {
+  id        String   @id @default(cuid())
+  vendorId  String
+  clientId  String
+  note      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  vendor Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  client User   @relation("ClientNotesReceived", fields: [clientId], references: [id])
+
+  @@index([vendorId])
+  @@index([clientId])
+}
+
+model FollowUpReminder {
+  id          String    @id @default(cuid())
+  vendorId    String
+  clientId    String
+  note        String
+  remindAt    DateTime
+  isCompleted Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+
+  vendor Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  client User   @relation("FollowUpReminders", fields: [clientId], references: [id])
+
+  @@index([vendorId])
+  @@index([remindAt])
+}
+
+// ── Referrals ─────────────────────────────────────────────────
+
+model Referral {
+  id           String    @id @default(cuid())
+  referrerId   String
+  refereeId    String?
+  code         String    @unique
+  type         String    // "client" | "vendor"
+  status       String    @default("PENDING") // PENDING | COMPLETED | REWARDED
+  rewardAmount Int?
+  rewardCurrency Currency @default(NGN)
+  completedAt  DateTime?
+  createdAt    DateTime  @default(now())
+
+  referrer User  @relation("ReferralsSent", fields: [referrerId], references: [id])
+  referee  User? @relation("ReferralsReceived", fields: [refereeId], references: [id])
+
+  @@index([referrerId])
+  @@index([code])
+}
+
+// ── Vendor Packages / Bundles ────────────────────────────────
+
+model VendorBundle {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  discount    Int      @default(0) // percentage
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  items BundleItem[]
+}
+
+model BundleItem {
+  id        String @id @default(cuid())
+  bundleId  String
+  vendorId  String
+  packageId String?
+
+  bundle  VendorBundle  @relation(fields: [bundleId], references: [id], onDelete: Cascade)
+  vendor  Vendor        @relation(fields: [vendorId], references: [id])
+
+  @@index([bundleId])
+}
+
+// ── Real Weddings / Video Testimonials ───────────────────────
+
+model RealWedding {
+  id          String   @id @default(cuid())
+  bookingId   String?  @unique
+  clientId    String
+  vendorId    String?
+  title       String?
+  description String?
+  photos      String[] // URLs
+  isPublished Boolean  @default(false)
+  isFeatured  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  client User    @relation("ClientRealWeddings", fields: [clientId], references: [id])
+  vendor Vendor? @relation(fields: [vendorId], references: [id])
+
+  @@index([clientId])
+  @@index([isPublished])
+}
+
+model VideoTestimonial {
+  id          String   @id @default(cuid())
+  bookingId   String   @unique
+  clientId    String
+  vendorId    String
+  videoUrl    String
+  thumbnailUrl String?
+  caption     String?
+  isApproved  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  client  User   @relation("ClientTestimonials", fields: [clientId], references: [id])
+  vendor  Vendor @relation(fields: [vendorId], references: [id])
+}
+
+// ── Wedding Planner Role ──────────────────────────────────────
+
+model PlannerProfile {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  businessName String?
+  bio          String?
+  website      String?
+  instagram    String?
+  whatsapp     String?
+  country      String   @default("NG")
+  city         String?
+  commissionPct Int     @default(10) // % earned on facilitated bookings
+  isVerified   Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user    User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  clients PlannerClient[]
+
+  @@index([userId])
+}
+
+model PlannerClient {
+  id               String   @id @default(cuid())
+  plannerId        String
+  clientId         String
+  weddingProfileId String?
+  notes            String?
+  createdAt        DateTime @default(now())
+
+  planner PlannerProfile @relation(fields: [plannerId], references: [id], onDelete: Cascade)
+  client  User           @relation("PlannerClients", fields: [clientId], references: [id])
+
+  @@unique([plannerId, clientId])
+  @@index([plannerId])
+}
+
+// ── Vendor Academy ────────────────────────────────────────────
+
+model AcademyArticle {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  excerpt     String?
+  content     String
+  category    String   // "pricing", "marketing", "photography", "operations"
+  audience    String   @default("vendor") // "vendor" | "client"
+  coverImage  String?
+  readMinutes Int      @default(5)
+  isPublished Boolean  @default(false)
+  publishedAt DateTime?
+  authorId    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([category])
+  @@index([isPublished])
+}
+
+model SupportTicket {
+  id          String   @id @default(cuid())
+  ticketNumber String  @unique
+  userId      String?
+  name        String
+  email       String
+  subject     String
+  description String
+  category    String   @default("GENERAL") // GENERAL, BOOKING, PAYMENT, VENDOR, ACCOUNT, OTHER
+  priority    String   @default("NORMAL")  // LOW, NORMAL, HIGH, URGENT
+  status      String   @default("OPEN")    // OPEN, IN_PROGRESS, RESOLVED, CLOSED
+  adminNotes  String?
+  assignedTo  String?
+  resolvedAt  DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User?    @relation(fields: [userId], references: [id])
+  replies     TicketReply[]
+
+  @@index([status])
+  @@index([userId])
+  @@index([email])
+}
+
+model TicketReply {
+  id         String   @id @default(cuid())
+  ticketId   String
+  senderId   String?
+  senderName String
+  body       String
+  isAdmin    Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  ticket     SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId])
+}
+
+model ChatSession {
+  id        String   @id @default(cuid())
+  userId    String?
+  sessionId String   @unique
+  messages  Json     @default("[]")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
