@@ -166,8 +166,9 @@ model Vendor {
   planExpiry   DateTime?
   stripeCustomerId String?
   stripeSubId      String?
-  stripeAccountId  String?
-  stripeOnboarded  Boolean  @default(false)
+  stripeAccountId     String?
+  stripeOnboarded     Boolean  @default(false)
+  milestoneTemplate   String?
   // Payment account fields
   paystackSubaccountCode String?
   bankName               String?
