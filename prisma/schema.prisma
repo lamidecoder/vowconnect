@@ -42,6 +42,41 @@ enum Currency {
   KES
 }
 
+enum MilestoneStatus {
+  PENDING
+  PAID
+  RELEASE_REQUESTED
+  RELEASED
+  DISPUTED
+  REFUNDED
+  TRANSFER_FAILED
+}
+
+enum PaymentStatus {
+  UNPAID
+  PARTIAL
+  PAID
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+enum DisputeStatus {
+  OPEN
+  INVESTIGATING
+  RESOLVED_CLIENT
+  RESOLVED_VENDOR
+  DISMISSED
+}
+
+enum RsvpStatus {
+  PENDING
+  ATTENDING
+  DECLINED
+  MAYBE
+}
+
 model User {
   id          String    @id @default(cuid())
   email       String    @unique
@@ -55,7 +90,7 @@ model User {
   googleId         String?  @unique
   emailVerifyExpiry DateTime?
   passwordHash  String?
-  country     String?   @default("NG")   // ISO 3166-1 alpha-2
+  country     String?   @default("NG")
   timezone    String?   @default("Africa/Lagos")
   locale      String?   @default("en-NG")
   deletedAt   DateTime?
@@ -71,7 +106,6 @@ model User {
   asoebiLed      AsoebiGroup[]  @relation("AsoebiLead")
   asoebiJoined   AsoebiMember[] @relation("AsoebiMemberships")
   passwordResets PasswordResetToken[]
-  // New features
   weddingProfile    WeddingProfile?
   sentMessages      Message[]          @relation("SentMessages")
   conversations     Conversation[]     @relation("ClientConversations")
@@ -85,6 +119,8 @@ model User {
   videoTestimonials VideoTestimonial[] @relation("ClientTestimonials")
   plannerProfile    PlannerProfile?
   plannerClients    PlannerClient[]    @relation("PlannerClients")
+  payments          Payment[]          @relation("ClientPayments")
+  disputes          Dispute[]          @relation("ClientDisputes")
 
   @@index([email])
   @@index([role])
@@ -106,35 +142,38 @@ model Vendor {
   businessName String
   bio          String?
   categoryId   String
-  // Location — worldwide
-  location     String                       // Human-readable: "Brixton, London"
-  city         String?                      // "London"
-  country      String       @default("NG") // ISO code: "GB", "US", "NG"
-  countryName  String?                     // "United Kingdom"
-  lgaArea      String?                     // Nigerian LGA (legacy)
+  location     String
+  city         String?
+  country      String       @default("NG")
+  countryName  String?
+  lgaArea      String?
   latitude     Float?
   longitude    Float?
-  // Pricing — multi-currency
   priceMin     Int
   priceMax     Int
   currency     Currency     @default(NGN)
-  // Contact
   whatsapp     String
   instagram    String?
   website      String?
-  // Status
   isAvailable  Boolean      @default(true)
   isVerified   Boolean      @default(false)
   isFeatured   Boolean      @default(false)
-  isDiaspora   Boolean      @default(false)  // Serves diaspora clients (travels/ships internationally)
-  servesCountries String?                    // JSON array of ISO codes e.g. '["NG","GB","US"]'
+  isDiaspora   Boolean      @default(false)
+  servesCountries String?
   status       VendorStatus @default(PENDING_REVIEW)
   profileViews Int          @default(0)
-  // Subscription
-  plan         String       @default("free")   // free | pro | premium
+  plan         String       @default("free")
   planExpiry   DateTime?
   stripeCustomerId String?
   stripeSubId      String?
+  // Payment account fields
+  paystackSubaccountCode String?
+  bankName               String?
+  bankCode               String?
+  accountNumber          String?
+  accountName            String?
+  bankCountry            String?  @default("NG")
+  bankVerified           Boolean  @default(false)
   deletedAt    DateTime?
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
@@ -149,7 +188,6 @@ model Vendor {
   blockedDates BlockedDate[]
   asoebiGroups AsoebiGroup[]
   analytics    AnalyticsEvent[]
-  // New features
   conversations    Conversation[]
   packages         VendorPackage[]
   quotes           Quote[]
@@ -171,8 +209,8 @@ model PortfolioImage {
   vendorId     String
   url          String
   cloudinaryId String
-  mediaType    String   @default("image")  // "image" | "video"
-  thumbnailUrl String?  // for videos
+  mediaType    String   @default("image")
+  thumbnailUrl String?
   caption      String?
   order        Int      @default(0)
   createdAt    DateTime @default(now())
@@ -192,8 +230,8 @@ model Booking {
   currency     Currency      @default(NGN)
   notes        String?
   status       BookingStatus @default(PENDING)
+  paymentStatus PaymentStatus @default(UNPAID)
   overriddenBy String?
-  // Deposit / payment
   depositAmount   Int?
   depositPaid     Boolean  @default(false)
   depositRef      String?
@@ -202,12 +240,85 @@ model Booking {
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 
-  client User   @relation("ClientBookings", fields: [clientId], references: [id])
-  vendor Vendor @relation(fields: [vendorId], references: [id])
-  review Review?
+  client     User               @relation("ClientBookings", fields: [clientId], references: [id])
+  vendor     Vendor             @relation(fields: [vendorId], references: [id])
+  review     Review?
+  milestones BookingMilestone[]
+  payments   Payment[]
+  disputes   Dispute[]
 
   @@index([clientId])
   @@index([vendorId])
+  @@index([status])
+}
+
+model BookingMilestone {
+  id                 String          @id @default(cuid())
+  bookingId          String
+  order              Int
+  title              String
+  description        String?
+  percentage         Float
+  amount             Float
+  vendorAmount       Float?
+  status             MilestoneStatus @default(PENDING)
+  dueDate            DateTime?
+  paidAt             DateTime?
+  releaseRequestedAt DateTime?
+  releasedAt         DateTime?
+  disputedAt         DateTime?
+  transferRef        String?
+  autoReleased       Boolean         @default(false)
+  createdAt          DateTime        @default(now())
+
+  booking  Booking   @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  payments Payment[]
+  disputes Dispute[]
+
+  @@index([bookingId])
+  @@index([status])
+}
+
+model Payment {
+  id           String        @id @default(cuid())
+  reference    String        @unique
+  bookingId    String
+  milestoneId  String?
+  clientId     String
+  amount       Float
+  commission   Float
+  vendorAmount Float
+  currency     String        @default("NGN")
+  status       PaymentStatus @default(PENDING)
+  paidAt       DateTime?
+  createdAt    DateTime      @default(now())
+
+  booking     Booking           @relation(fields: [bookingId], references: [id])
+  milestone   BookingMilestone? @relation(fields: [milestoneId], references: [id])
+  client      User              @relation("ClientPayments", fields: [clientId], references: [id])
+
+  @@index([bookingId])
+  @@index([reference])
+  @@index([status])
+}
+
+model Dispute {
+  id          String        @id @default(cuid())
+  bookingId   String
+  milestoneId String?
+  clientId    String
+  reason      String
+  evidence    String?
+  status      DisputeStatus @default(OPEN)
+  resolution  String?
+  resolvedAt  DateTime?
+  createdAt   DateTime      @default(now())
+
+  booking   Booking           @relation(fields: [bookingId], references: [id])
+  milestone BookingMilestone? @relation(fields: [milestoneId], references: [id])
+  client    User              @relation("ClientDisputes", fields: [clientId], references: [id])
+
+  @@index([bookingId])
   @@index([status])
 }
 
@@ -243,7 +354,7 @@ model Report {
   targetId    String
   reason      String
   description String?
-  status      String   @default("OPEN")   // OPEN | RESOLVED | DISMISSED
+  status      String   @default("OPEN")
   createdAt   DateTime @default(now())
   reporter User @relation("Reporter", fields: [reporterId], references: [id])
   vendor   Vendor? @relation("ReportedVendor", fields: [targetId], references: [id])
@@ -269,7 +380,6 @@ model SystemSetting {
   updatedAt DateTime @updatedAt
 }
 
-// ── Availability Calendar ─────────────────────────────────────
 model BlockedDate {
   id        String   @id @default(cuid())
   vendorId  String
@@ -281,7 +391,6 @@ model BlockedDate {
   @@index([vendorId])
 }
 
-// ── Asoebi Group Booking ─────────────────────────────────────
 model AsoebiGroup {
   id           String   @id @default(cuid())
   leadClientId String
@@ -318,7 +427,6 @@ model AsoebiMember {
   @@index([groupId])
 }
 
-// ── WhatsApp Log ─────────────────────────────────────────────
 model WhatsAppLog {
   id         String   @id @default(cuid())
   vendorId   String?
@@ -334,7 +442,6 @@ model WhatsAppLog {
   @@index([bookingId])
 }
 
-// ── Analytics Events ─────────────────────────────────────────
 model AnalyticsEvent {
   id        String   @id @default(cuid())
   vendorId  String
@@ -357,15 +464,6 @@ model PasswordResetToken {
   usedAt    DateTime?
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-// ── Wedding Planning Suite ────────────────────────────────────
-
-enum RsvpStatus {
-  PENDING
-  ATTENDING
-  DECLINED
-  MAYBE
 }
 
 model WeddingProfile {
@@ -397,7 +495,7 @@ model WeddingProfile {
 model BudgetItem {
   id               String   @id @default(cuid())
   weddingProfileId String
-  category         String   // "Gele Stylist", "Photography", etc.
+  category         String
   label            String
   estimatedAmount  Int      @default(0)
   actualAmount     Int      @default(0)
@@ -419,7 +517,7 @@ model Guest {
   name             String
   email            String?
   phone            String?
-  side             String?    // "bride" | "groom" | "both"
+  side             String?
   rsvpStatus       RsvpStatus @default(PENDING)
   dietaryNeeds     String?
   tableNumber      Int?
@@ -443,7 +541,7 @@ model MoodBoardPin {
   caption          String?
   sourceVendorId   String?
   sourceUrl        String?
-  category         String?  // "dress", "decor", "makeup", "gele", etc.
+  category         String?
   order            Int      @default(0)
   createdAt        DateTime @default(now())
 
@@ -458,10 +556,10 @@ model TimelineItem {
   title            String
   description      String?
   dueDate          DateTime?
-  category         String?   // "booking", "admin", "beauty", "decor", etc.
+  category         String?
   isCompleted      Boolean   @default(false)
-  vendorCategory   String?   // if linked to a vendor category
-  priority         String    @default("medium") // low | medium | high
+  vendorCategory   String?
+  priority         String    @default("medium")
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 
@@ -469,8 +567,6 @@ model TimelineItem {
 
   @@index([weddingProfileId])
 }
-
-// ── Vendor Enquiry / Messaging ────────────────────────────────
 
 model Conversation {
   id         String   @id @default(cuid())
@@ -505,8 +601,6 @@ model Message {
   @@index([senderId])
 }
 
-// ── Quote Builder ─────────────────────────────────────────────
-
 model VendorPackage {
   id          String   @id @default(cuid())
   vendorId    String
@@ -514,8 +608,8 @@ model VendorPackage {
   description String?
   price       Int
   currency    Currency @default(NGN)
-  duration    String?  // e.g. "4 hours", "full day"
-  includes    String[] // list of inclusions
+  duration    String?
+  includes    String[]
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -530,7 +624,7 @@ model Quote {
   id         String   @id @default(cuid())
   clientId   String
   vendorId   String
-  status     String   @default("DRAFT") // DRAFT | SENT | ACCEPTED | DECLINED | EXPIRED
+  status     String   @default("DRAFT")
   totalAmount Int
   currency   Currency @default(NGN)
   validUntil DateTime?
@@ -561,8 +655,6 @@ model QuoteItem {
 
   @@index([quoteId])
 }
-
-// ── Vendor CRM ────────────────────────────────────────────────
 
 model ClientNote {
   id        String   @id @default(cuid())
@@ -595,15 +687,13 @@ model FollowUpReminder {
   @@index([remindAt])
 }
 
-// ── Referrals ─────────────────────────────────────────────────
-
 model Referral {
   id           String    @id @default(cuid())
   referrerId   String
   refereeId    String?
   code         String    @unique
-  type         String    // "client" | "vendor"
-  status       String    @default("PENDING") // PENDING | COMPLETED | REWARDED
+  type         String
+  status       String    @default("PENDING")
   rewardAmount Int?
   rewardCurrency Currency @default(NGN)
   completedAt  DateTime?
@@ -616,13 +706,11 @@ model Referral {
   @@index([code])
 }
 
-// ── Vendor Packages / Bundles ────────────────────────────────
-
 model VendorBundle {
   id          String   @id @default(cuid())
   name        String
   description String?
-  discount    Int      @default(0) // percentage
+  discount    Int      @default(0)
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
 
@@ -641,8 +729,6 @@ model BundleItem {
   @@index([bundleId])
 }
 
-// ── Real Weddings / Video Testimonials ───────────────────────
-
 model RealWedding {
   id          String   @id @default(cuid())
   bookingId   String?  @unique
@@ -650,7 +736,7 @@ model RealWedding {
   vendorId    String?
   title       String?
   description String?
-  photos      String[] // URLs
+  photos      String[]
   isPublished Boolean  @default(false)
   isFeatured  Boolean  @default(false)
   createdAt   DateTime @default(now())
@@ -677,8 +763,6 @@ model VideoTestimonial {
   vendor  Vendor @relation(fields: [vendorId], references: [id])
 }
 
-// ── Wedding Planner Role ──────────────────────────────────────
-
 model PlannerProfile {
   id           String   @id @default(cuid())
   userId       String   @unique
@@ -689,7 +773,7 @@ model PlannerProfile {
   whatsapp     String?
   country      String   @default("NG")
   city         String?
-  commissionPct Int     @default(10) // % earned on facilitated bookings
+  commissionPct Int     @default(10)
   isVerified   Boolean  @default(false)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -715,16 +799,14 @@ model PlannerClient {
   @@index([plannerId])
 }
 
-// ── Vendor Academy ────────────────────────────────────────────
-
 model AcademyArticle {
   id          String   @id @default(cuid())
   slug        String   @unique
   title       String
   excerpt     String?
   content     String
-  category    String   // "pricing", "marketing", "photography", "operations"
-  audience    String   @default("vendor") // "vendor" | "client"
+  category    String
+  audience    String   @default("vendor")
   coverImage  String?
   readMinutes Int      @default(5)
   isPublished Boolean  @default(false)
@@ -738,24 +820,24 @@ model AcademyArticle {
 }
 
 model SupportTicket {
-  id          String   @id @default(cuid())
-  ticketNumber String  @unique
-  userId      String?
-  name        String
-  email       String
-  subject     String
-  description String
-  category    String   @default("GENERAL") // GENERAL, BOOKING, PAYMENT, VENDOR, ACCOUNT, OTHER
-  priority    String   @default("NORMAL")  // LOW, NORMAL, HIGH, URGENT
-  status      String   @default("OPEN")    // OPEN, IN_PROGRESS, RESOLVED, CLOSED
-  adminNotes  String?
-  assignedTo  String?
-  resolvedAt  DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           String   @id @default(cuid())
+  ticketNumber String   @unique
+  userId       String?
+  name         String
+  email        String
+  subject      String
+  description  String
+  category     String   @default("GENERAL")
+  priority     String   @default("NORMAL")
+  status       String   @default("OPEN")
+  adminNotes   String?
+  assignedTo   String?
+  resolvedAt   DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  user        User?    @relation(fields: [userId], references: [id])
-  replies     TicketReply[]
+  user    User?         @relation(fields: [userId], references: [id])
+  replies TicketReply[]
 
   @@index([status])
   @@index([userId])
@@ -771,7 +853,7 @@ model TicketReply {
   isAdmin    Boolean  @default(false)
   createdAt  DateTime @default(now())
 
-  ticket     SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  ticket SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
 
   @@index([ticketId])
 }
