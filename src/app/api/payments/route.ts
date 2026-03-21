@@ -1,134 +1,190 @@
 // src/app/api/payments/route.ts
+// Unified payment API — routes to Paystack or Stripe automatically
 import { NextRequest, NextResponse } from 'next/server'
 import { requireRole } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { initializeTransaction, verifyTransaction, calculateSplit, generateReference } from '@/lib/paystack'
+import { generateReference } from '@/lib/paystack'
+import { getPaymentProvider, calculatePaymentBreakdown } from '@/lib/payment-router'
 
 const APP = process.env.NEXT_PUBLIC_APP_URL ?? 'https://vowconnect.com'
 const COMMISSION = Number(process.env.PLATFORM_COMMISSION_PERCENT ?? 3)
 
-// POST /api/payments — initialize a booking payment
-export async function POST(req: NextRequest) {
+// GET /api/payments?bookingId=xxx — get payment breakdown before paying
+export async function GET(req: NextRequest) {
   const auth = await requireRole(req, ['CLIENT'])
   if ('error' in auth) return auth.error
 
-  const { bookingId, milestoneIndex } = await req.json()
+  const { searchParams } = new URL(req.url)
+  const bookingId     = searchParams.get('bookingId')
+  const milestoneIndex = Number(searchParams.get('milestone') ?? 0)
 
-  // Load booking with vendor and milestone details
+  if (!bookingId) return NextResponse.json({ error: 'bookingId required' }, { status: 400 })
+
   const booking = await prisma.booking.findUnique({
     where: { id: bookingId },
     include: {
-      vendor: {
-        select: {
-          businessName: true,
-          paystackSubaccountCode: true,
-          bankVerified: true,
-          currency: true,
-        },
-      },
-      client: {
-        select: { email: true, name: true },
-      },
+      vendor: { select: { country: true, currency: true, businessName: true } },
       milestones: { orderBy: { order: 'asc' } },
     },
   })
 
   if (!booking) return NextResponse.json({ error: 'Booking not found' }, { status: 404 })
   if (booking.clientId !== auth.userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
-  if (!booking.vendor.paystackSubaccountCode) {
-    return NextResponse.json({ error: 'Vendor has not set up their payment account yet' }, { status: 400 })
-  }
 
-  const milestone = booking.milestones[milestoneIndex ?? 0]
+  const milestone = booking.milestones[milestoneIndex]
   if (!milestone) return NextResponse.json({ error: 'Milestone not found' }, { status: 404 })
-  if (milestone.status !== 'PENDING') return NextResponse.json({ error: 'Milestone already paid' }, { status: 400 })
+  if (milestone.status !== 'PENDING') return NextResponse.json({ error: 'Already paid' }, { status: 400 })
 
-  // Calculate split
-  const split  = calculateSplit(milestone.amount, COMMISSION)
-  const ref    = generateReference('VC_MS')
-
-  // Initialize Paystack transaction
-  const transaction = await initializeTransaction({
-    email:              booking.client.email,
-    amount:             split.totalKobo,
-    currency:           booking.vendor.currency ?? 'NGN',
-    reference:          ref,
-    subaccountCode:     booking.vendor.paystackSubaccountCode,
-    transactionCharge:  split.commissionKobo,
-    callbackUrl:        `${APP}/client/bookings/${bookingId}?payment=verify&ref=${ref}`,
-    metadata: {
-      bookingId,
-      milestoneId:    milestone.id,
-      milestoneIndex: milestoneIndex ?? 0,
-      clientId:       auth.userId,
-      vendorName:     booking.vendor.businessName,
-      description:    milestone.title,
-    },
-  })
-
-  // Save payment record
-  await prisma.payment.create({
-    data: {
-      reference:     ref,
-      bookingId,
-      milestoneId:   milestone.id,
-      amount:        milestone.amount,
-      commission:    split.commissionNaira,
-      vendorAmount:  split.vendorNaira,
-      currency:      booking.vendor.currency ?? 'NGN',
-      status:        'PENDING',
-      clientId:      auth.userId,
-    },
-  })
+  const breakdown = calculatePaymentBreakdown(milestone.amount, booking.vendor.country, COMMISSION)
 
   return NextResponse.json({
-    authorizationUrl: transaction.authorization_url,
-    reference:        ref,
-    amount:           milestone.amount,
-    breakdown: {
-      total:      milestone.amount,
-      commission: split.commissionNaira,
-      vendor:     split.vendorNaira,
-      fee:        split.paystackFeeKobo / 100,
+    milestone: {
+      index:      milestoneIndex,
+      title:      milestone.title,
+      amount:     milestone.amount,
+      percentage: milestone.percentage,
     },
+    breakdown,
+    vendorName: booking.vendor.businessName,
+    provider:   breakdown.provider, // hidden from UI but useful for debugging
   })
 }
 
-// GET /api/payments?ref=xxx — verify payment after redirect
-export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url)
-  const ref = searchParams.get('ref')
-  if (!ref) return NextResponse.json({ error: 'No reference' }, { status: 400 })
+// POST /api/payments — initialize payment
+export async function POST(req: NextRequest) {
+  const auth = await requireRole(req, ['CLIENT'])
+  if ('error' in auth) return auth.error
 
-  try {
-    const transaction = await verifyTransaction(ref)
+  const { bookingId, milestoneIndex = 0 } = await req.json()
 
-    if (transaction.status !== 'success') {
-      return NextResponse.json({ error: 'Payment not successful', status: transaction.status }, { status: 400 })
+  const booking = await prisma.booking.findUnique({
+    where: { id: bookingId },
+    include: {
+      vendor: {
+        select: {
+          country: true, currency: true, businessName: true,
+          paystackSubaccountCode: true, bankVerified: true,
+          stripeAccountId: true, stripeOnboarded: true,
+        },
+      },
+      client: { select: { email: true, name: true } },
+      milestones: { orderBy: { order: 'asc' } },
+    },
+  })
+
+  if (!booking) return NextResponse.json({ error: 'Booking not found' }, { status: 404 })
+  if (booking.clientId !== auth.userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
+
+  const milestone = booking.milestones[milestoneIndex]
+  if (!milestone) return NextResponse.json({ error: 'Milestone not found' }, { status: 404 })
+  if (milestone.status !== 'PENDING') return NextResponse.json({ error: 'Already paid' }, { status: 400 })
+
+  const breakdown = calculatePaymentBreakdown(milestone.amount, booking.vendor.country, COMMISSION)
+  const ref       = generateReference('VC')
+  const provider  = breakdown.provider
+
+  // Save payment record first
+  await prisma.payment.create({
+    data: {
+      reference:    ref,
+      bookingId,
+      milestoneId:  milestone.id,
+      clientId:     auth.userId,
+      amount:       milestone.amount,
+      commission:   breakdown.commissionAmount,
+      vendorAmount: breakdown.vendorAmount,
+      currency:     breakdown.currency,
+      status:       'PENDING',
+    },
+  })
+
+  const callbackUrl = `${APP}/client/bookings/${bookingId}?payment=verify&ref=${ref}&milestone=${milestoneIndex}`
+  const metadata    = {
+    bookingId,
+    milestoneId:    milestone.id,
+    milestoneIndex,
+    clientId:       auth.userId,
+    provider,
+    ref,
+  }
+
+  // Route to correct provider
+  if (provider === 'paystack') {
+    if (!booking.vendor.paystackSubaccountCode) {
+      return NextResponse.json({
+        error: 'This vendor has not set up their payment account yet. Please contact them directly.',
+      }, { status: 400 })
     }
 
-    const { bookingId, milestoneId } = transaction.metadata
+    const { initializeTransaction, calculateSplit } = await import('@/lib/paystack')
+    const split = calculateSplit(breakdown.totalAmount, COMMISSION)
 
-    // Update payment record
-    await prisma.payment.update({
-      where:  { reference: ref },
-      data:   { status: 'SUCCESS', paidAt: new Date() },
+    const transaction = await initializeTransaction({
+      email:             booking.client.email,
+      amount:            split.totalKobo,
+      currency:          breakdown.currency,
+      reference:         ref,
+      subaccountCode:    booking.vendor.paystackSubaccountCode,
+      transactionCharge: split.commissionKobo,
+      callbackUrl,
+      metadata,
     })
 
-    // Update milestone status
-    await prisma.bookingMilestone.update({
-      where: { id: milestoneId },
-      data:  { status: 'PAID', paidAt: new Date() },
+    return NextResponse.json({
+      checkoutUrl: transaction.authorization_url,
+      reference:   ref,
+      provider:    'secure', // never expose provider name
+      breakdown,
     })
-
-    // Update booking status if first milestone
-    await prisma.booking.update({
-      where: { id: bookingId },
-      data:  { status: 'ACCEPTED', paymentStatus: 'PARTIAL' },
-    })
-
-    return NextResponse.json({ success: true, bookingId })
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 400 })
   }
+
+  if (provider === 'stripe') {
+    if (!booking.vendor.stripeAccountId || !booking.vendor.stripeOnboarded) {
+      return NextResponse.json({
+        error: 'This vendor has not set up their payment account yet. Please contact them directly.',
+      }, { status: 400 })
+    }
+
+    const stripe = (await import('@/lib/stripe')).stripe
+    if (!stripe) {
+      return NextResponse.json({ error: 'Payment processing unavailable' }, { status: 503 })
+    }
+
+    const amountCents        = Math.round(breakdown.totalAmount * 100)
+    const applicationFeeCents = Math.round(breakdown.commissionAmount * 100)
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      mode:                 'payment',
+      customer_email:       booking.client.email,
+      line_items: [{
+        price_data: {
+          currency:     breakdown.currency.toLowerCase(),
+          unit_amount:  amountCents,
+          product_data: {
+            name:        `${milestone.title} — ${booking.vendor.businessName}`,
+            description: `Milestone ${milestoneIndex + 1} payment via VowConnect`,
+          },
+        },
+        quantity: 1,
+      }],
+      payment_intent_data: {
+        application_fee_amount: applicationFeeCents,
+        transfer_data: { destination: booking.vendor.stripeAccountId },
+        metadata: { ...metadata },
+      },
+      success_url: `${callbackUrl}&status=success`,
+      cancel_url:  `${APP}/client/bookings/${bookingId}?payment=cancelled`,
+      metadata,
+    })
+
+    return NextResponse.json({
+      checkoutUrl: session.url,
+      reference:   ref,
+      provider:    'secure',
+      breakdown,
+    })
+  }
+
+  return NextResponse.json({ error: 'Payment provider not available' }, { status: 500 })
 }
