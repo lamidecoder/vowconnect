@@ -156,8 +156,8 @@ export async function generateStaticParams() {
 }
 
 // Dynamic metadata for SEO
-export async function generateMetadata({ params }: { params: { city: string } }): Promise<Metadata> {
-  const city = CITIES[params.city.toLowerCase()]
+export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+  const city = CITIES[params.id.toLowerCase()]
   if (!city) return { title: 'Not Found' }
 
   return {
@@ -167,18 +167,18 @@ export async function generateMetadata({ params }: { params: { city: string } })
     openGraph: {
       title: `${city.headline} | VowConnect`,
       description: `Find verified Nigerian wedding vendors in ${city.name} — ${city.popularCategories.join(', ')} and more.`,
-      url: `https://vowconnect.vercel.app/vendors/${params.city}`,
+      url: `https://vowconnect.vercel.app/vendors/${params.id}`,
       siteName: 'VowConnect',
       type: 'website',
     },
     alternates: {
-      canonical: `https://vowconnect.vercel.app/vendors/${params.city}`,
+      canonical: `https://vowconnect.vercel.app/vendors/${params.id}`,
     },
   }
 }
 
-export default async function CityPage({ params }: { params: { city: string } }) {
-  const citySlug = params.city.toLowerCase()
+export default async function CityPage({ params }: { params: { id: string } }) {
+  const citySlug = params.id.toLowerCase()
   const city     = CITIES[citySlug]
   if (!city) notFound()
 
@@ -213,7 +213,7 @@ export default async function CityPage({ params }: { params: { city: string } })
         '@type': 'LocalBusiness',
         name: `VowConnect ${city.name}`,
         description: `Nigerian wedding vendor marketplace in ${city.name}`,
-        url: `https://vowconnect.vercel.app/vendors/${citySlug}`,
+        url: `https://vowconnect.vercel.app/city/${citySlug}`,
         areaServed: city.name,
         serviceType: 'Wedding Vendor Marketplace',
       })}}/>
@@ -494,7 +494,7 @@ export default async function CityPage({ params }: { params: { city: string } })
             <h2 className="font-display text-2xl sm:text-3xl mb-6" style={{color:'var(--text)'}}>Vendors in other cities</h2>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {nearbyCities.map(([slug, c]) => (
-                <Link key={slug} href={`/vendors/${slug}`}
+                <Link key={slug} href={`/city/${slug}`}
                   className="p-4 rounded-2xl text-center transition-all hover:scale-[1.02]"
                   style={{background:'var(--bg-card)', border:'1px solid var(--border)'}}>
                   <div className="text-2xl mb-1">{c.flag}</div>
