@@ -1,0 +1,17 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="512" height="512" rx="120" fill="#0a0a0a"/>
+  
+  <!-- Outer ring -->
+  <circle cx="256" cy="256" r="160" stroke="#C8A96E" stroke-width="28" fill="none"/>
+  
+  <!-- Inner ring -->
+  <circle cx="256" cy="256" r="90" stroke="#C8A96E" stroke-width="14" fill="none" opacity="0.4"/>
+  
+  <!-- Diamond top of ring -->
+  <path d="M256 72 L290 120 L256 100 L222 120 Z" fill="#C8A96E"/>
+  <path d="M256 100 L290 120 L256 148 L222 120 Z" fill="#8B6914"/>
+  
+  <!-- V letter in center -->
+  <path d="M196 200 L256 320 L316 200" stroke="#C8A96E" stroke-width="28" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>
