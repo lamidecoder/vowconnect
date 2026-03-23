@@ -68,6 +68,8 @@ The best photographers understand Nigerian wedding structure: the traditional ce
   },
 }
 
+export const dynamic = 'force-dynamic'
+
 export async function generateStaticParams() {
   return Object.keys(CATEGORIES).map(slug => ({ slug }))
 }
@@ -90,20 +92,23 @@ export default async function CategoryPage({ params }: { params: { slug: string 
   const cat = CATEGORIES[params.slug]
   if (!cat) notFound()
 
-  const vendors = await prisma.vendor.findMany({
-    where: {
-      category:  { slug: params.slug },
-      status:    'APPROVED',
-      deletedAt: null,
-    },
-    include: {
-      category: true,
-      reviews:  { select: { rating: true } },
-      portfolio:{ take:1, orderBy:{ order:'asc' } },
-    },
-    orderBy: [{ isFeatured:'desc' }, { profileViews:'desc' }],
-    take: 9,
-  })
+  let vendors: any[] = []
+  try {
+    vendors = await prisma.vendor.findMany({
+      where: {
+        category:  { slug: params.slug },
+        status:    'APPROVED',
+        deletedAt: null,
+      },
+      include: {
+        category: true,
+        reviews:  { select: { rating: true } },
+        portfolio:{ take:1, orderBy:{ order:'asc' } },
+      },
+      orderBy: [{ isFeatured:'desc' }, { profileViews:'desc' }],
+      take: 9,
+    })
+  } catch(e) { vendors = [] }
 
   return (
     <div className="min-h-screen" style={{background:'var(--bg)'}}>
